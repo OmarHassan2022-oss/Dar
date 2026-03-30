@@ -7,9 +7,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 :root{
   --g1:#0D3B0F;--g2:#1B5E20;--g3:#2E7D32;--g4:#4CAF50;--g5:#A5D6A7;
@@ -19,13 +16,13 @@
   --bg:#F0F4F0;--card:#fff;--border:#DDE8DD;
   --txt:#1A2E1A;--txt2:#4A5E4A;--txtl:#8A9E8A;
   --shadow:0 2px 14px rgba(0,50,0,.07);--shadow-lg:0 8px 32px rgba(0,50,0,.13);
-  --r:12px;--rl:18px;--rxl:24px;
+  --r:12px;--rl:18px;
   --sw:275px;--hh:66px;
   --tr:all .28s cubic-bezier(.4,0,.2,1);
 }
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);overflow-x:hidden}
-::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-thumb{background:var(--g4);border-radius:10px}
 
 .loading-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:10000;display:none}
@@ -38,53 +35,46 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);over
 @keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(20px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 .modal{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:10001;align-items:center;justify-content:center}
 .modal.show{display:flex}
-.modal-content{background:var(--card);border-radius:var(--rl);max-width:500px;width:90%;max-height:80vh;overflow-y:auto;animation:modalSlide .3s ease}
-@keyframes modalSlide{from{transform:translateY(-50px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-content{background:var(--card);border-radius:var(--rl);max-width:500px;width:90%;max-height:80vh;overflow-y:auto}
 .modal-header{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
 .modal-body{padding:22px}
 .modal-footer{padding:16px 22px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end}
 
-.sidebar{position:fixed;right:0;top:0;width:var(--sw);height:100vh;background:linear-gradient(175deg,var(--g1) 0%,#071A08 100%);z-index:1000;overflow-y:auto;overflow-x:hidden;box-shadow:-3px 0 20px rgba(0,0,0,.25);transition:var(--tr)}
-.sb-head{padding:22px 16px 18px;text-align:center;border-bottom:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.2)}
-.sb-logo{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--gold3),var(--gold2));display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:26px;color:#fff;box-shadow:0 4px 18px rgba(218,165,32,.35)}
-.sb-title{color:var(--gold2);font-family:'Amiri',serif;font-size:17px;font-weight:700;line-height:1.5}
+.sidebar{position:fixed;right:0;top:0;width:var(--sw);height:100vh;background:linear-gradient(175deg,var(--g1) 0%,#071A08 100%);z-index:1000;overflow-y:auto;box-shadow:-3px 0 20px rgba(0,0,0,.25);transition:var(--tr)}
+.sb-head{padding:22px 16px 18px;text-align:center;border-bottom:1px solid rgba(255,255,255,.08)}
+.sb-logo{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,var(--gold3),var(--gold2));display:flex;align-items:center;justify-content:center;margin:0 auto 10px;font-size:26px;color:#fff}
+.sb-title{color:var(--gold2);font-family:'Amiri',serif;font-size:17px;font-weight:700}
 .sb-sub{color:rgba(255,255,255,.5);font-size:11px;margin-top:3px}
 .sb-nav{padding:12px 10px 24px}
-.sb-sec{color:rgba(255,255,255,.35);font-size:10px;font-weight:700;padding:14px 14px 6px;letter-spacing:1.2px;text-transform:uppercase}
-.ni{display:flex;align-items:center;padding:10px 14px;color:rgba(255,255,255,.7);text-decoration:none;border-radius:var(--r);margin-bottom:1px;transition:var(--tr);cursor:pointer;position:relative;user-select:none}
+.sb-sec{color:rgba(255,255,255,.35);font-size:10px;font-weight:700;padding:14px 14px 6px}
+.ni{display:flex;align-items:center;padding:10px 14px;color:rgba(255,255,255,.7);text-decoration:none;border-radius:var(--r);margin-bottom:1px;transition:var(--tr);cursor:pointer}
 .ni:hover{background:rgba(255,255,255,.07);color:#fff}
-.ni.active{background:linear-gradient(120deg,var(--g4),var(--g3));color:#fff;box-shadow:0 3px 14px rgba(76,175,80,.3)}
-.ni i.icon{width:20px;font-size:15px;margin-left:11px;text-align:center;flex-shrink:0}
+.ni.active{background:linear-gradient(120deg,var(--g4),var(--g3));color:#fff}
+.ni i.icon{width:20px;font-size:15px;margin-left:11px}
 .ni .nt{font-size:13.5px;font-weight:500;flex:1}
-.nbadge{background:#ef4444;color:#fff;font-size:10px;padding:1px 7px;border-radius:10px;font-weight:700;min-width:20px;text-align:center}
+.nbadge{background:#ef4444;color:#fff;font-size:10px;padding:1px 7px;border-radius:10px;font-weight:700}
 .nbadge.gld{background:linear-gradient(135deg,var(--gold3),var(--gold))}
-.ni .arrow{font-size:10px;transition:var(--tr);margin-right:auto;color:rgba(255,255,255,.4)}
-.ni.exp .arrow{transform:rotate(-90deg)}
-.sub{max-height:0;overflow:hidden;transition:max-height .32s ease;padding-right:18px}
-.sub.open{max-height:500px}
-.sub .ni{padding:9px 14px;font-size:12.5px}
-.sub .ni i.icon{font-size:6px}
 .sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:999}
 .sb-overlay.show{display:block}
 
 .main{margin-right:var(--sw);min-height:100vh;transition:var(--tr)}
-.hdr{height:var(--hh);background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 26px;position:sticky;top:0;z-index:100;box-shadow:0 1px 8px rgba(0,50,0,.05)}
+.hdr{height:var(--hh);background:var(--card);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 26px;position:sticky;top:0;z-index:100}
 .hdr-r{display:flex;align-items:center;gap:14px}
-.menu-btn{display:none;background:none;border:none;font-size:20px;cursor:pointer;color:var(--txt);padding:8px;border-radius:8px;transition:var(--tr)}
+.menu-btn{display:none;background:none;border:none;font-size:20px;cursor:pointer;color:var(--txt);padding:8px;border-radius:8px}
 .menu-btn:hover{background:var(--bg)}
 .page-ttl h2{font-size:19px;font-weight:700}
 .page-ttl .bc{font-size:12px;color:var(--txtl);margin-top:1px}
 .hdr-l{display:flex;align-items:center;gap:10px}
 .srch{position:relative}
-.srch input{width:260px;padding:9px 38px 9px 14px;border:1px solid var(--border);border-radius:var(--r);font-family:'Tajawal',sans-serif;font-size:13px;background:var(--bg);transition:var(--tr);outline:none}
-.srch input:focus{border-color:var(--g4);box-shadow:0 0 0 3px rgba(76,175,80,.1);width:300px}
-.srch i{position:absolute;right:13px;top:50%;transform:translateY(-50%);color:var(--txtl);font-size:13px}
-.hico{width:40px;height:40px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;transition:var(--tr);background:var(--bg);border:1px solid var(--border);color:var(--txt2);font-size:15px}
-.hico:hover{background:var(--g4);color:#fff;border-color:var(--g4)}
+.srch input{width:260px;padding:9px 38px 9px 14px;border:1px solid var(--border);border-radius:var(--r);font-family:'Tajawal',sans-serif;font-size:13px;background:var(--bg);outline:none}
+.srch input:focus{border-color:var(--g4)}
+.srch i{position:absolute;right:13px;top:50%;transform:translateY(-50%);color:var(--txtl)}
+.hico{width:40px;height:40px;border-radius:var(--r);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;background:var(--bg);border:1px solid var(--border);color:var(--txt2)}
+.hico:hover{background:var(--g4);color:#fff}
 .hico .bdg{position:absolute;top:-4px;left:-4px;width:17px;height:17px;border-radius:50%;background:#ef4444;color:#fff;font-size:9px;display:flex;align-items:center;justify-content:center;font-weight:700;border:2px solid #fff}
-.uprofile{display:flex;align-items:center;gap:9px;padding:5px 11px;border-radius:var(--r);cursor:pointer;transition:var(--tr);border:1px solid var(--border)}
+.uprofile{display:flex;align-items:center;gap:9px;padding:5px 11px;border-radius:var(--r);cursor:pointer;border:1px solid var(--border)}
 .uprofile:hover{background:var(--bg)}
-.uav{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--g2),var(--g4));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:13px}
+.uav{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--g2),var(--g4));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
 .uinfo .nm{font-size:13.5px;font-weight:600}
 .uinfo .rl{font-size:11px;color:var(--txtl)}
 
@@ -95,34 +85,28 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);over
 .card-hdr{padding:18px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px}
 .card-hdr h3{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
 .card-body{padding:22px}
-.btn{padding:9px 18px;border-radius:9px;border:none;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:13px;font-weight:600;transition:var(--tr);display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.btn{padding:9px 18px;border-radius:9px;border:none;cursor:pointer;font-family:'Tajawal',sans-serif;font-size:13px;font-weight:600;transition:var(--tr);display:inline-flex;align-items:center;gap:6px}
 .btn-primary{background:linear-gradient(135deg,var(--g3),var(--g4));color:#fff}
 .btn-primary:hover{box-shadow:0 4px 14px rgba(76,175,80,.35);transform:translateY(-1px)}
-.btn-gold{background:linear-gradient(135deg,var(--gold3),var(--gold));color:#fff}
-.btn-gold:hover{box-shadow:0 4px 14px rgba(218,165,32,.35);transform:translateY(-1px)}
 .btn-outline{background:transparent;border:1px solid var(--border);color:var(--txt2)}
 .btn-outline:hover{background:var(--bg)}
 .btn-danger{background:#ef4444;color:#fff}
-.btn-success{background:#22c55e;color:#fff}
 .btn-sm{padding:6px 13px;font-size:12px}
 .form-group{margin-bottom:18px}
 .form-label{display:block;font-size:13px;font-weight:600;color:var(--txt2);margin-bottom:6px}
-.form-label .req{color:var(--red2)}
-.form-control{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-family:'Tajawal',sans-serif;font-size:14px;background:var(--card);color:var(--txt);transition:var(--tr);outline:none}
-.form-control:focus{border-color:var(--g4);box-shadow:0 0 0 3px rgba(76,175,80,.1)}
+.form-control{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:var(--r);font-family:'Tajawal',sans-serif;font-size:14px;background:var(--card);color:var(--txt);outline:none}
+.form-control:focus{border-color:var(--g4)}
 .form-row{display:grid;gap:16px}
 .form-row.cols-2{grid-template-columns:1fr 1fr}
 .form-row.cols-3{grid-template-columns:1fr 1fr 1fr}
-.form-row.cols-4{grid-template-columns:1fr 1fr 1fr 1fr}
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:11.5px;font-weight:600}
 .b-green{background:rgba(34,197,94,.1);color:#16a34a}
 .b-blue{background:rgba(33,150,243,.1);color:#1565c0}
 .b-gold{background:rgba(218,165,32,.1);color:#92670f}
-.b-red{background:rgba(239,68,68,.1);color:#dc2626}
 .stats-grid{display:grid;gap:18px}
 .stats-4{grid-template-columns:repeat(4,1fr)}
-.scard{background:var(--card);border-radius:var(--rl);padding:22px;display:flex;align-items:flex-start;justify-content:space-between;box-shadow:var(--shadow);border:1px solid var(--border);transition:var(--tr);position:relative;overflow:hidden}
-.scard::before{content:'';position:absolute;top:0;right:0;width:100%;height:3px;border-radius:var(--rl) var(--rl) 0 0}
+.scard{background:var(--card);border-radius:var(--rl);padding:22px;display:flex;align-items:flex-start;justify-content:space-between;box-shadow:var(--shadow);border:1px solid var(--border);position:relative;overflow:hidden}
+.scard::before{content:'';position:absolute;top:0;right:0;width:100%;height:3px}
 .scard.sc1::before{background:linear-gradient(90deg,var(--g2),var(--g4))}
 .scard.sc2::before{background:linear-gradient(90deg,#1565c0,#42a5f5)}
 .scard.sc3::before{background:linear-gradient(90deg,var(--gold3),var(--gold2))}
@@ -135,83 +119,57 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);over
 .si3{background:rgba(218,165,32,.1);color:var(--gold)}
 .si4{background:rgba(156,39,176,.1);color:#9c27b0}
 .tbl-wrap{overflow-x:auto}
-.dtbl{width:100%;border-collapse:separate;border-spacing:0}
-.dtbl thead th{background:var(--bg);padding:11px 15px;text-align:right;font-size:12.5px;font-weight:700;color:var(--txt2);border-bottom:1px solid var(--border);white-space:nowrap}
-.dtbl tbody td{padding:13px 15px;font-size:13.5px;border-bottom:1px solid var(--border);vertical-align:middle}
-.dtbl tbody tr:hover{background:rgba(76,175,80,.025)}
-.av-sm{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.dtbl{width:100%;border-collapse:collapse}
+.dtbl thead th{background:var(--bg);padding:12px 15px;text-align:right;font-size:12.5px;font-weight:700;color:var(--txt2);border-bottom:1px solid var(--border)}
+.dtbl tbody td{padding:12px 15px;font-size:13.5px;border-bottom:1px solid var(--border)}
+.dtbl tbody tr:hover{background:rgba(76,175,80,.02)}
+.av-sm{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff}
 .cell-user{display:flex;align-items:center;gap:9px}
 .grid-2{display:grid;grid-template-columns:2fr 1fr;gap:22px}
-.grid-2-eq{display:grid;grid-template-columns:1fr 1fr;gap:22px}
 .prog-row{margin-bottom:16px}
 .prog-hdr{display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px}
 .prog-bar{height:9px;background:var(--bg);border-radius:10px;overflow:hidden}
-.prog-fill{height:100%;border-radius:10px;transition:width 1.2s ease}
+.prog-fill{height:100%;border-radius:10px}
 .pf-green{background:linear-gradient(90deg,var(--g2),var(--g4))}
-.pf-blue{background:linear-gradient(90deg,#1565c0,#42a5f5)}
-.pf-gold{background:linear-gradient(90deg,var(--gold3),var(--gold2))}
 .qmap-wrap{display:grid;grid-template-columns:repeat(30,1fr);gap:4px;padding:4px}
-.juz-cell{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;cursor:pointer;transition:var(--tr);border:1.5px solid transparent}
-.juz-cell.j-mastered{background:linear-gradient(135deg,var(--g3),var(--g4));color:#fff;border-color:var(--g2)}
-.juz-cell.j-memorized{background:rgba(76,175,80,.3);color:var(--g2);border-color:var(--g4)}
-.juz-cell.j-inprog{background:rgba(249,168,37,.2);color:#d97706;border-color:#f59e0b}
-.juz-cell.j-empty{background:rgba(0,0,0,.04);color:var(--txtl);border-color:var(--border)}
-.juz-cell.j-revision{background:rgba(33,150,243,.2);color:#1565c0;border-color:#3b82f6}
+.juz-cell{aspect-ratio:1;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;cursor:pointer;border:1.5px solid transparent}
+.juz-cell.j-mastered{background:linear-gradient(135deg,var(--g3),var(--g4));color:#fff}
+.juz-cell.j-memorized{background:rgba(76,175,80,.3);color:var(--g2)}
+.juz-cell.j-empty{background:rgba(0,0,0,.04);color:var(--txtl)}
 .g-exc{background:rgba(34,197,94,.1);color:#16a34a;padding:3px 11px;border-radius:20px;font-size:12px;font-weight:600}
-.g-vg{background:rgba(33,150,243,.1);color:#1565c0;padding:3px 11px;border-radius:20px;font-size:12px;font-weight:600}
-.g-gd{background:rgba(249,168,37,.1);color:#d97706;padding:3px 11px;border-radius:20px;font-size:12px;font-weight:600}
-.g-ac{background:rgba(249,115,22,.1);color:#ea580c;padding:3px 11px;border-radius:20px;font-size:12px;font-weight:600}
 .divider{border:none;border-top:1px solid var(--border);margin:20px 0}
 .footer{padding:18px 26px;text-align:center;color:var(--txtl);font-size:12.5px;border-top:1px solid var(--border);margin-top:18px}
-.ndrop{display:none;position:absolute;top:calc(100% + 8px);left:0;width:340px;background:var(--card);border-radius:var(--rl);box-shadow:var(--shadow-lg);border:1px solid var(--border);z-index:200}
+.ndrop{display:none;position:absolute;top:calc(100% + 8px);left:0;width:320px;background:var(--card);border-radius:var(--rl);box-shadow:var(--shadow-lg);border:1px solid var(--border);z-index:200}
 .ndrop.show{display:block}
-.ndrop-hdr{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center}
+.ndrop-hdr{padding:14px 18px;border-bottom:1px solid var(--border)}
 .nlist{max-height:300px;overflow-y:auto}
-.nitem{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;gap:10px;cursor:pointer;transition:var(--tr)}
+.nitem{padding:12px 18px;border-bottom:1px solid var(--border);display:flex;gap:10px;cursor:pointer}
 .nitem:hover{background:var(--bg)}
-.nitem.unread{border-right:3px solid var(--g4);background:rgba(76,175,80,.02)}
-.nitem-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.nitem.unread{border-right:3px solid var(--g4)}
+.nitem-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center}
 .ni-grn{background:rgba(34,197,94,.1);color:#22c55e}
-.ni-blu{background:rgba(33,150,243,.1);color:#3b82f6}
-.ni-red{background:rgba(239,68,68,.1);color:#ef4444}
-.ni-gld{background:rgba(218,165,32,.1);color:var(--gold)}
-.nitem-body .title{font-size:12.5px;font-weight:600;margin-bottom:2px}
-.nitem-body .time{font-size:11px;color:var(--txtl)}
 .info-box{padding:14px 16px;border-radius:var(--r);font-size:13px;display:flex;align-items:flex-start;gap:10px;margin-bottom:16px}
 .ib-green{background:rgba(76,175,80,.08);border:1px solid rgba(76,175,80,.2);color:var(--g2)}
-.ib-blue{background:rgba(33,150,243,.08);border:1px solid rgba(33,150,243,.2);color:#1565c0}
-.ib-gold{background:rgba(218,165,32,.08);border:1px solid rgba(218,165,32,.2);color:#92670f}
 .ts-list{list-style:none}
 .ts-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
 .ts-item:last-child{border-bottom:none}
 .ts-info{flex:1}
 .ts-info .nm{font-size:13.5px;font-weight:600}
-.ts-info .dt{font-size:11.5px;color:var(--txtl)}
 .ts-pts{font-size:15px;font-weight:700;color:var(--gold)}
-.rank-badge{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0}
+.rank-badge{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800}
 .rk1{background:linear-gradient(135deg,#ffd700,#ffa000);color:#fff}
 .rk2{background:linear-gradient(135deg,#c0c0c0,#9e9e9e);color:#fff}
 .rk3{background:linear-gradient(135deg,#cd7f32,#a0522d);color:#fff}
 .rk-oth{background:var(--bg);color:var(--txt2)}
-.halqa-cards{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.hq-card{background:var(--bg);border-radius:var(--r);padding:14px;border:1px solid var(--border);transition:var(--tr)}
-.hq-card:hover{border-color:var(--g4)}
-.hq-name{font-size:14px;font-weight:700;color:var(--g2);margin-bottom:6px;display:flex;align-items:center;gap:5px}
-.hq-teacher{font-size:12px;color:var(--txt2);margin-bottom:6px}
-.hq-foot{display:flex;justify-content:space-between;font-size:11px;color:var(--txtl);margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
 .today-bar{background:linear-gradient(135deg,var(--g3),var(--g4));border-radius:var(--rl);padding:16px 22px;display:flex;align-items:center;justify-content:space-between;color:#fff;margin-bottom:22px;flex-wrap:wrap;gap:15px}
 .tb-l{display:flex;align-items:center;gap:14px}
 .tb-icon{width:46px;height:46px;background:rgba(255,255,255,.2);border-radius:var(--r);display:flex;align-items:center;justify-content:center;font-size:20px}
 .tb-date h3{font-size:15px;font-weight:700}
-.tb-date p{font-size:12px;opacity:.85}
-.tb-stats{display:flex;gap:28px;flex-wrap:wrap}
+.tb-stats{display:flex;gap:28px}
 .tb-stat{text-align:center}
 .tb-stat .num{font-size:22px;font-weight:800}
-.tb-stat .lbl{font-size:11px;opacity:.85}
-.qverse{background:linear-gradient(135deg,var(--g1),var(--g2));border-radius:var(--rl);padding:26px;text-align:center;color:#fff;margin-bottom:22px;position:relative;overflow:hidden}
-.qverse::before{content:'﷽';position:absolute;top:-30px;right:-20px;font-size:130px;opacity:.04;font-family:'Amiri',serif}
-.qv-text{font-family:'Amiri',serif;font-size:22px;line-height:2.2;margin-bottom:10px}
-.qv-ref{font-size:13px;opacity:.75}
+.qverse{background:linear-gradient(135deg,var(--g1),var(--g2));border-radius:var(--rl);padding:26px;text-align:center;color:#fff;margin-bottom:22px}
+.qv-text{font-family:'Amiri',serif;font-size:22px;line-height:2.2}
 @media(max-width:768px){
   .sidebar{transform:translateX(100%)}
   .sidebar.open{transform:translateX(0)}
@@ -220,7 +178,8 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);over
   .stats-4{grid-template-columns:1fr 1fr}
   .grid-2{grid-template-columns:1fr}
   .srch{display:none}
-  .form-row.cols-2,.form-row.cols-3,.form-row.cols-4{grid-template-columns:1fr}
+  .form-row.cols-2,.form-row.cols-3{grid-template-columns:1fr}
+  .tb-stats{gap:15px}
 }
 </style>
 </head>
@@ -235,28 +194,23 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);over
   <div class="sb-head"><div class="sb-logo"><i class="fas fa-quran"></i></div><div class="sb-title">دار الإمام مالك</div><div class="sb-sub">لتحفيظ القرآن الكريم</div></div>
   <nav class="sb-nav">
     <div class="sb-sec">القائمة الرئيسية</div>
-    <a class="ni active" onclick="showPage('dashboard',this)"><i class="fas fa-th-large icon"></i><span class="nt">لوحة التحكم</span></a>
+    <a class="ni active" onclick="showPage('dashboard')"><i class="fas fa-th-large icon"></i><span class="nt">لوحة التحكم</span></a>
     <div class="sb-sec">إدارة الدار</div>
-    <a class="ni" onclick="showPage('students',this)"><i class="fas fa-user-graduate icon"></i><span class="nt">الطلاب</span><span class="nbadge" id="studentsCount">0</span></a>
-    <a class="ni" onclick="showPage('teachers',this)"><i class="fas fa-chalkboard-user icon"></i><span class="nt">المحفظون</span><span class="nbadge gld" id="teachersCount">0</span></a>
-    <a class="ni" onclick="showPage('halaqas',this)"><i class="fas fa-mosque icon"></i><span class="nt">الحلقات</span><span class="nbadge" id="halaqasCount">0</span></a>
+    <a class="ni" onclick="showPage('students')"><i class="fas fa-user-graduate icon"></i><span class="nt">الطلاب</span><span class="nbadge" id="studentsCount">0</span></a>
+    <a class="ni" onclick="showPage('teachers')"><i class="fas fa-chalkboard-user icon"></i><span class="nt">المحفظون</span><span class="nbadge gld" id="teachersCount">0</span></a>
+    <a class="ni" onclick="showPage('halaqas')"><i class="fas fa-mosque icon"></i><span class="nt">الحلقات</span><span class="nbadge" id="halaqasCount">0</span></a>
     <div class="sb-sec">التعليم والمتابعة</div>
-    <a class="ni" onclick="showPage('recitation',this)"><i class="fas fa-book-open icon"></i><span class="nt">التسميع اليومي</span></a>
-    <a class="ni" onclick="showPage('progress',this)"><i class="fas fa-chart-line icon"></i><span class="nt">تقدم الحفظ</span></a>
-    <a class="ni" onclick="showPage('attendance',this)"><i class="fas fa-clipboard-check icon"></i><span class="nt">الحضور والغياب</span></a>
-    <a class="ni" onclick="showPage('exams',this)"><i class="fas fa-file-alt icon"></i><span class="nt">الاختبارات</span></a>
+    <a class="ni" onclick="showPage('recitation')"><i class="fas fa-book-open icon"></i><span class="nt">التسميع اليومي</span></a>
+    <a class="ni" onclick="showPage('progress')"><i class="fas fa-chart-line icon"></i><span class="nt">تقدم الحفظ</span></a>
+    <a class="ni" onclick="showPage('attendance')"><i class="fas fa-clipboard-check icon"></i><span class="nt">الحضور والغياب</span></a>
     <div class="sb-sec">التحفيز والتكريم</div>
-    <a class="ni" onclick="showPage('rewards',this)"><i class="fas fa-trophy icon"></i><span class="nt">المكافآت والنقاط</span></a>
-    <a class="ni" onclick="showPage('certificate',this)"><i class="fas fa-certificate icon"></i><span class="nt">الشهادات</span></a>
-    <a class="ni" onclick="showPage('competitions',this)"><i class="fas fa-medal icon"></i><span class="nt">المسابقات</span></a>
+    <a class="ni" onclick="showPage('certificate')"><i class="fas fa-certificate icon"></i><span class="nt">الشهادات</span></a>
+    <a class="ni" onclick="showPage('competitions')"><i class="fas fa-medal icon"></i><span class="nt">المسابقات</span></a>
     <div class="sb-sec">التواصل</div>
-    <a class="ni" onclick="showPage('parent',this)"><i class="fas fa-users icon"></i><span class="nt">بوابة ولي الأمر</span></a>
-    <a class="ni" onclick="showPage('messages',this)"><i class="fas fa-envelope icon"></i><span class="nt">الرسائل</span><span class="nbadge" id="messagesCount">0</span></a>
-    <div class="sb-sec">مالية وتقارير</div>
-    <a class="ni" onclick="showPage('finance',this)"><i class="fas fa-money-bill-wave icon"></i><span class="nt">المالية</span></a>
-    <a class="ni" onclick="showPage('reports',this)"><i class="fas fa-chart-bar icon"></i><span class="nt">التقارير المتقدمة</span></a>
+    <a class="ni" onclick="showPage('parent')"><i class="fas fa-users icon"></i><span class="nt">بوابة ولي الأمر</span></a>
+    <div class="sb-sec">تقارير</div>
+    <a class="ni" onclick="showPage('reports')"><i class="fas fa-chart-bar icon"></i><span class="nt">التقارير</span></a>
     <div class="sb-sec">النظام</div>
-    <a class="ni" onclick="showPage('settings',this)"><i class="fas fa-cog icon"></i><span class="nt">الإعدادات</span></a>
     <a class="ni" onclick="logout()" style="color:rgba(239,68,68,.8)"><i class="fas fa-sign-out-alt icon"></i><span class="nt">تسجيل الخروج</span></a>
   </nav>
 </aside>
@@ -267,80 +221,63 @@ body{font-family:'Tajawal',sans-serif;background:var(--bg);color:var(--txt);over
       <div class="page-ttl"><h2 id="pageTitle">لوحة التحكم</h2><div class="bc"><a href="#">الرئيسية</a> / <span id="pageCrumb">لوحة التحكم</span></div></div>
     </div>
     <div class="hdr-l">
-      <div class="srch"><i class="fas fa-search"></i><input type="text" id="globalSearch" placeholder="بحث عن طالب، محفظ، حلقة..." onkeyup="globalSearch()"></div>
-      <div class="hico" onclick="toggleNotif()"><i class="fas fa-bell"></i><span class="bdg" id="notifCount">0</span><div class="ndrop" id="ndrop"><div class="ndrop-hdr"><h4>الإشعارات</h4><button class="btn btn-outline btn-sm" onclick="clearAllNotifications()">مسح الكل</button></div><div id="notifList" class="nlist"></div></div></div>
-      <div class="uprofile" onclick="showUserMenu()"><div class="uav" id="userAvatar">م.أ</div><div class="uinfo"><div class="nm" id="userName">محمد الأحمدي</div><div class="rl" id="userRole">مدير الدار</div></div><i class="fas fa-chevron-down" style="font-size:10px;color:var(--txtl)"></i></div>
+      <div class="srch"><i class="fas fa-search"></i><input type="text" id="globalSearch" placeholder="بحث..." onkeyup="globalSearch()"></div>
+      <div class="hico" onclick="toggleNotif()"><i class="fas fa-bell"></i><span class="bdg" id="notifCount">0</span><div class="ndrop" id="ndrop"><div class="ndrop-hdr"><h4>الإشعارات</h4></div><div id="notifList" class="nlist"></div></div></div>
+      <div class="uprofile"><div class="uav" id="userAvatar">م.أ</div><div class="uinfo"><div class="nm" id="userName">محمد الأحمدي</div><div class="rl" id="userRole">مدير الدار</div></div></div>
     </div>
   </header>
 
   <!-- Dashboard Page -->
   <div id="pg-dashboard" class="page active">
     <div class="qverse"><div class="qv-text">﴿ إِنَّا نَحْنُ نَزَّلْنَا الذِّكْرَ وَإِنَّا لَهُ لَحَافِظُونَ ﴾</div><div class="qv-ref">سورة الحجر — الآية 9</div></div>
-    <div class="today-bar"><div class="tb-l"><div class="tb-icon"><i class="fas fa-calendar-day"></i></div><div class="tb-date"><h3 id="currentDate"></h3><p id="currentGregorian"></p></div></div><div class="tb-stats"><div class="tb-stat"><div class="num" id="todayPresent">0</div><div class="lbl">حاضرون</div></div><div class="tb-stat"><div class="num" id="todayAbsent">0</div><div class="lbl">غائبون</div></div><div class="tb-stat"><div class="num" id="todayRecitations">0</div><div class="lbl">تسميعات</div></div><div class="tb-stat"><div class="num" id="activeHalaqas">0</div><div class="lbl">حلقة نشطة</div></div></div></div>
+    <div class="today-bar"><div class="tb-l"><div class="tb-icon"><i class="fas fa-calendar-day"></i></div><div class="tb-date"><h3 id="currentDate"></h3><p id="currentGregorian"></p></div></div><div class="tb-stats"><div class="tb-stat"><div class="num" id="todayRecitations">0</div><div class="lbl">تسميعات اليوم</div></div></div></div>
     <div class="stats-grid stats-4" style="margin-bottom:22px">
-      <div class="scard sc1"><div class="sc-info"><h3 id="statStudents">0</h3><p>إجمالي الطلاب</p></div><div class="sc-icon si1"><i class="fas fa-user-graduate"></i></div></div>
+      <div class="scard sc1"><div class="sc-info"><h3 id="statStudents">0</h3><p>الطلاب</p></div><div class="sc-icon si1"><i class="fas fa-user-graduate"></i></div></div>
       <div class="scard sc2"><div class="sc-info"><h3 id="statTeachers">0</h3><p>المحفظون</p></div><div class="sc-icon si2"><i class="fas fa-chalkboard-user"></i></div></div>
-      <div class="scard sc3"><div class="sc-info"><h3 id="statHalaqas">0</h3><p>الحلقات النشطة</p></div><div class="sc-icon si3"><i class="fas fa-mosque"></i></div></div>
+      <div class="scard sc3"><div class="sc-info"><h3 id="statHalaqas">0</h3><p>الحلقات</p></div><div class="sc-icon si3"><i class="fas fa-mosque"></i></div></div>
       <div class="scard sc4"><div class="sc-info"><h3 id="statAttendance">0</h3><p>نسبة الحضور</p></div><div class="sc-icon si4"><i class="fas fa-chart-pie"></i></div></div>
     </div>
-    <div class="grid-2" style="margin-bottom:22px">
-      <div class="card"><div class="card-hdr"><h3><i class="fas fa-book-open"></i> آخر التسميعات</h3><button class="btn btn-primary btn-sm" onclick="showPage('recitation')"><i class="fas fa-plus"></i> تسميع جديد</button></div><div class="tbl-wrap"><table class="dtbl"><thead><tr><th>الطالب</th><th>المقطع</th><th>التقييم</th><th>الدرجة</th><th>التاريخ</th></tr></thead><tbody id="recentRecitations"></tbody></table></div></div>
-      <div><div class="card" style="margin-bottom:22px"><div class="card-hdr"><h3><i class="fas fa-crown"></i> أفضل الطلاب</h3><button class="btn btn-outline btn-sm" onclick="refreshLeaderboard()">تحديث</button></div><div style="padding:6px 18px"><ul class="ts-list" id="topStudents"></ul></div></div><div class="card"><div class="card-hdr"><h3><i class="fas fa-mosque"></i> الحلقات النشطة</h3></div><div class="card-body"><div class="halqa-cards" id="activeHalaqasList"></div></div></div></div>
+    <div class="grid-2">
+      <div class="card"><div class="card-hdr"><h3><i class="fas fa-book-open"></i> آخر التسميعات</h3><button class="btn btn-primary btn-sm" onclick="showPage('recitation')"><i class="fas fa-plus"></i> جديد</button></div><div class="tbl-wrap"><table class="dtbl"><thead><tr><th>الطالب</th><th>المقطع</th><th>التقييم</th><th>التاريخ</th></tr></thead><tbody id="recentRecitations"></tbody></table></div></div>
+      <div class="card"><div class="card-hdr"><h3><i class="fas fa-crown"></i> أفضل الطلاب</h3></div><div><ul class="ts-list" id="topStudents"></ul></div></div>
     </div>
-    <div class="footer"><p><i class="fas fa-quran" style="color:var(--g4)"></i> دار الإمام مالك لتحفيظ القرآن الكريم &copy; 1446 هـ — جميع الحقوق محفوظة</p><p style="margin-top:4px;font-size:11px">تم التطوير بخدمة كتاب الله</p></div>
+    <div class="footer"><p>دار الإمام مالك لتحفيظ القرآن الكريم</p></div>
   </div>
 
   <!-- Students Page -->
-  <div id="pg-students" class="page"><div class="card"><div class="card-hdr"><h3><i class="fas fa-user-graduate"></i> إدارة الطلاب</h3><button class="btn btn-primary" onclick="showAddStudentModal()"><i class="fas fa-plus"></i> إضافة طالب</button></div><div class="tbl-wrap"><table class="dtbl"><thead><tr><th>#</th><th>الطالب</th><th>الحلقة</th><th>الأجزاء المحفوظة</th><th>نسبة الحضور</th><th>النقاط</th><th>الإجراءات</th></tr></thead><tbody id="studentsTable"></tbody></table></div></div></div>
+  <div id="pg-students" class="page"><div class="card"><div class="card-hdr"><h3><i class="fas fa-user-graduate"></i> الطلاب</h3><button class="btn btn-primary" onclick="showAddStudentModal()"><i class="fas fa-plus"></i> إضافة طالب</button></div><div class="tbl-wrap"><table class="dtbl"><thead><tr><th>#</th><th>الطالب</th><th>الأجزاء</th><th>النقاط</th><th>الإجراءات</th></tr></thead><tbody id="studentsTable"></tbody></table></div></div></div>
 
   <!-- Teachers Page -->
-  <div id="pg-teachers" class="page"><div class="card"><div class="card-hdr"><h3><i class="fas fa-chalkboard-user"></i> إدارة المحفظين</h3><button class="btn btn-primary" onclick="showAddTeacherModal()"><i class="fas fa-plus"></i> إضافة محفظ</button></div><div class="tbl-wrap"><table class="dtbl"><thead><tr><th>#</th><th>المحفظ</th><th>الحلقة</th><th>عدد الطلاب</th><th>حالة</th><th>الإجراءات</th></tr></thead><tbody id="teachersTable"></tbody></table></div></div></div>
+  <div id="pg-teachers" class="page"><div class="card"><div class="card-hdr"><h3><i class="fas fa-chalkboard-user"></i> المحفظون</h3><button class="btn btn-primary" onclick="showAddTeacherModal()"><i class="fas fa-plus"></i> إضافة محفظ</button></div><div class="tbl-wrap"><table class="dtbl"><thead><tr><th>#</th><th>الاسم</th><th>الحالة</th><th>الإجراءات</th></tr></thead><tbody id="teachersTable"></tbody></table></div></div></div>
 
   <!-- Halaqas Page -->
-  <div id="pg-halaqas" class="page"><div class="card"><div class="card-hdr"><h3><i class="fas fa-mosque"></i> إدارة الحلقات</h3><button class="btn btn-primary" onclick="showAddHalaqaModal()"><i class="fas fa-plus"></i> إضافة حلقة</button></div><div class="tbl-wrap"><table class="dtbl"><thead><tr><th>#</th><th>اسم الحلقة</th><th>المحفظ</th><th>عدد الطلاب</th><th>الموقع</th><th>الحالة</th><th>الإجراءات</th></tr></thead><tbody id="halaqasTable"></tbody></table></div></div></div>
+  <div id="pg-halaqas" class="page"><div class="card"><div class="card-hdr"><h3><i class="fas fa-mosque"></i> الحلقات</h3><button class="btn btn-primary" onclick="showAddHalaqaModal()"><i class="fas fa-plus"></i> إضافة حلقة</button></div><div class="tbl-wrap"><table class="dtbl"><thead><tr><th>#</th><th>الاسم</th><th>الموقع</th><th>الإجراءات</th></tr></thead><tbody id="halaqasTable"></tbody></table></div></div></div>
 
   <!-- Recitation Page -->
-  <div id="pg-recitation" class="page"><div class="card"><div class="card-hdr"><h3><i class="fas fa-book-open"></i> تسجيل تسميع جديد</h3></div><div class="card-body"><div class="form-row cols-2"><div class="form-group"><label class="form-label">الطالب <span class="req">*</span></label><select class="form-control" id="recStudentId" onchange="loadStudentRecInfo()"></select></div><div class="form-group"><label class="form-label">نوع التسميع</label><select class="form-control" id="recType"><option value="new">حفظ جديد</option><option value="near">مراجعة قريبة</option><option value="far">مراجعة بعيدة</option><option value="full">مراجعة شاملة</option></select></div></div><div class="form-row cols-2"><div class="form-group"><label class="form-label">السورة</label><input type="text" class="form-control" id="recSurah" placeholder="مثال: البقرة"></div><div class="form-group"><label class="form-label">الآيات</label><input type="text" class="form-control" id="recVerses" placeholder="مثال: 1-20"></div></div><div class="form-row cols-3"><div class="form-group"><label class="form-label">أخطاء التجويد</label><input type="number" class="form-control" id="recTajweed" value="0" min="0"></div><div class="form-group"><label class="form-label">أخطاء النطق</label><input type="number" class="form-control" id="recPron" value="0" min="0"></div><div class="form-group"><label class="form-label">أخطاء الحفظ</label><input type="number" class="form-control" id="recMem" value="0" min="0"></div></div><div class="form-row cols-2"><div class="form-group"><label class="form-label">التقييم</label><select class="form-control" id="recGrade"><option value="ممتاز">⭐ ممتاز</option><option value="جيد جداً">👍 جيد جداً</option><option value="جيد">✅ جيد</option><option value="مقبول">➖ مقبول</option><option value="ضعيف">⚠️ ضعيف</option></select></div><div class="form-group"><label class="form-label">الدرجة (من 100)</label><input type="number" class="form-control" id="recScore" value="90" min="0" max="100"></div></div><div class="form-group"><label class="form-label">ملاحظات المحفظ</label><textarea class="form-control" id="recNotes" rows="2" placeholder="ملاحظات حول أداء الطالب..."></textarea></div><div style="display:flex;gap:10px"><button class="btn btn-primary" onclick="saveRecitation()"><i class="fas fa-save"></i> حفظ التسميع</button><button class="btn btn-gold" onclick="sendRecitationToParent()"><i class="fas fa-paper-plane"></i> حفظ وإرسال لولي الأمر</button><button class="btn btn-outline" onclick="clearRecitationForm()"><i class="fas fa-eraser"></i> تفريغ</button></div></div></div><div class="card"><div class="card-hdr"><h3><i class="fas fa-chart-line"></i> أداء الطالب — آخر 7 جلسات</h3></div><div class="card-body"><canvas id="studentPerformanceChart" height="200"></canvas></div></div><div class="card"><div class="card-hdr"><h3><i class="fas fa-history"></i> آخر التسميعات</h3></div><div class="tbl-wrap"><table class="dtbl"><thead><tr><th>الطالب</th><th>المقطع</th><th>التقييم</th><th>الدرجة</th><th>الأخطاء</th><th>التاريخ</th></tr></thead><tbody id="recHistoryTable"></tbody></table></div></div></div>
+  <div id="pg-recitation" class="page"><div class="card"><div class="card-hdr"><h3><i class="fas fa-book-open"></i> تسجيل تسميع</h3></div><div class="card-body"><div class="form-row cols-2"><div class="form-group"><label class="form-label">الطالب</label><select class="form-control" id="recStudentId"></select></div><div class="form-group"><label class="form-label">نوع التسميع</label><select class="form-control" id="recType"><option>حفظ جديد</option><option>مراجعة</option></select></div></div><div class="form-row cols-2"><div class="form-group"><label class="form-label">السورة</label><input type="text" class="form-control" id="recSurah" placeholder="مثال: البقرة"></div><div class="form-group"><label class="form-label">الآيات</label><input type="text" class="form-control" id="recVerses" placeholder="مثال: 1-20"></div></div><div class="form-row cols-3"><div class="form-group"><label class="form-label">أخطاء التجويد</label><input type="number" class="form-control" id="recTajweed" value="0" min="0"></div><div class="form-group"><label class="form-label">أخطاء النطق</label><input type="number" class="form-control" id="recPron" value="0" min="0"></div><div class="form-group"><label class="form-label">أخطاء الحفظ</label><input type="number" class="form-control" id="recMem" value="0" min="0"></div></div><div class="form-row cols-2"><div class="form-group"><label class="form-label">التقييم</label><select class="form-control" id="recGrade"><option>ممتاز</option><option>جيد جداً</option><option>جيد</option><option>مقبول</option></select></div><div class="form-group"><label class="form-label">الدرجة</label><input type="number" class="form-control" id="recScore" value="90" min="0" max="100"></div></div><div class="form-group"><label class="form-label">ملاحظات</label><textarea class="form-control" id="recNotes" rows="2"></textarea></div><button class="btn btn-primary" onclick="saveRecitation()"><i class="fas fa-save"></i> حفظ التسميع</button></div></div><div class="card"><div class="card-hdr"><h3><i class="fas fa-history"></i> آخر التسميعات</h3></div><div class="tbl-wrap"><table class="dtbl"><thead><tr><th>الطالب</th><th>المقطع</th><th>التقييم</th><th>التاريخ</th></tr></thead><tbody id="recHistoryTable"></tbody></table></div></div></div>
 
   <!-- Progress Page -->
-  <div id="pg-progress" class="page"><div class="card"><div class="card-hdr"><h3><i class="fas fa-chart-line"></i> خريطة القرآن الكريم</h3><div><select class="form-control" id="progressStudentSelect" onchange="renderQuranMap()" style="width:200px"></select></div></div><div class="card-body"><div class="info-box ib-green"><i class="fas fa-info-circle"></i><div>خريطة توضح تقدم الطالب في حفظ القرآن الكريم. كل جزء ملون حسب حالة الحفظ: <strong>أخضر</strong> متقن، <strong>أخضر فاتح</strong> محفوظ، <strong>أصفر</strong> قيد الحفظ، <strong>أزرق</strong> قيد المراجعة، <strong>رمادي</strong> لم يبدأ.</div></div><div class="qmap-wrap" id="juzMap"></div><div class="divider"></div><div class="stats-grid stats-4"><div class="scard sc1"><div class="sc-info"><h3 id="progressJuzCount">0</h3><p>أجزاء محفوظة</p></div><div class="sc-icon si1"><i class="fas fa-book"></i></div></div><div class="scard sc3"><div class="sc-info"><h3 id="progressPercent">0</h3><p>نسبة الإنجاز</p></div><div class="sc-icon si3"><i class="fas fa-chart-pie"></i></div></div><div class="scard sc2"><div class="sc-info"><h3 id="progressPoints">0</h3><p>النقاط</p></div><div class="sc-icon si2"><i class="fas fa-star"></i></div></div><div class="scard sc4"><div class="sc-info"><h3 id="progressAttendance">0</h3><p>نسبة الحضور</p></div><div class="sc-icon si4"><i class="fas fa-calendar-check"></i></div></div></div></div></div>
+  <div id="pg-progress" class="page"><div class="card"><div class="card-hdr"><h3><i class="fas fa-chart-line"></i> خريطة القرآن</h3></div><div class="card-body"><div class="qmap-wrap" id="juzMap"></div><div class="divider"></div><div class="info-box ib-green"><i class="fas fa-info-circle"></i><div>اختر طالباً لعرض خريطة تقدمه في حفظ القرآن</div></div><select class="form-control" id="progressStudentSelect" onchange="renderQuranMap()"></select></div></div></div>
 
   <!-- Attendance Page -->
-  <div id="pg-attendance" class="page"><div class="card"><div class="card-hdr"><h3><i class="fas fa-clipboard-check"></i> تسجيل الحضور والغياب</h3><div><button class="btn btn-primary btn-sm" onclick="saveAttendance()"><i class="fas fa-save"></i> حفظ الحضور</button><button class="btn btn-outline btn-sm" onclick="loadTodayAttendance()"><i class="fas fa-sync"></i> تحديث</button></div></div><div class="tbl-wrap"><table class="dtbl"><thead><tr><th>الطالب</th><th>الحلقة</th><th>الحالة</th><th>ملاحظات</th></tr></thead><tbody id="attendanceTable"></tbody></table></div></div><div class="card"><div class="card-hdr"><h3><i class="fas fa-chart-line"></i> تقرير الحضور الشهري</h3></div><div class="card-body"><canvas id="attendanceChart" height="200"></canvas></div></div></div>
-
-  <!-- Exams Page -->
-  <div id="pg-exams" class="page"><div class="card"><div class="card-hdr"><h3><i class="fas fa-file-alt"></i> الاختبارات</h3><button class="btn btn-primary" onclick="showAddExamModal()"><i class="fas fa-plus"></i> اختبار جديد</button></div><div class="tbl-wrap"><table class="dtbl"><thead><tr><th>الاختبار</th><th>التاريخ</th><th>المادة</th><th>عدد المشاركين</th><th>متوسط الدرجات</th><th>الإجراءات</th></tr></thead><tbody id="examsTable"></tbody></table></div></div></div>
-
-  <!-- Rewards Page -->
-  <div id="pg-rewards" class="page"><div class="card"><div class="card-hdr"><h3><i class="fas fa-trophy"></i> المكافآت والنقاط</h3><button class="btn btn-primary" onclick="showAddRewardModal()"><i class="fas fa-plus"></i> منح مكافأة</button></div><div class="tbl-wrap"><table class="dtbl"><thead><tr><th>الطالب</th><th>المكافأة</th><th>النقاط</th><th>التاريخ</th><th>المصدر</th></tr></thead><tbody id="rewardsTable"></tbody></table></div></div><div class="card"><div class="card-hdr"><h3><i class="fas fa-chart-bar"></i> ترتيب النقاط</h3></div><div class="card-body"><canvas id="pointsChart" height="200"></canvas></div></div></div>
+  <div id="pg-attendance" class="page"><div class="card"><div class="card-hdr"><h3><i class="fas fa-clipboard-check"></i> الحضور والغياب</h3><button class="btn btn-primary btn-sm" onclick="saveAttendance()"><i class="fas fa-save"></i> حفظ الحضور</button></div><div class="tbl-wrap"><table class="dtbl"><thead><tr><th>الطالب</th><th>الحلقة</th><th>الحالة</th><th>ملاحظات</th> </thead><tbody id="attendanceTable"></tbody>}</div></div></div>
 
   <!-- Certificate Page -->
-  <div id="pg-certificate" class="page"><div class="card"><div class="card-hdr"><h3><i class="fas fa-certificate"></i> إصدار شهادة</h3></div><div class="card-body"><div class="form-row cols-2"><div class="form-group"><label class="form-label">الطالب <span class="req">*</span></label><select class="form-control" id="certStudentId" onchange="updateCertPreview()"></select></div><div class="form-group"><label class="form-label">نوع الشهادة</label><select class="form-control" id="certType" onchange="updateCertPreview()"><option>شهادة إتمام حفظ جزء</option><option>شهادة إتمام حفظ القرآن</option><option>شهادة إجازة في رواية حفص</option><option>شهادة تفوق وتميز</option><option>شهادة مشاركة في مسابقة</option></select></div></div><div class="form-row cols-2"><div class="form-group"><label class="form-label">التفاصيل</label><input type="text" class="form-control" id="certDetails" placeholder="مثال: الجزء الثلاثين" onchange="updateCertPreview()"></div><div class="form-group"><label class="form-label">تاريخ الإصدار</label><input type="date" class="form-control" id="certDate" onchange="updateCertPreview()"></div></div><div class="form-row cols-2"><div class="form-group"><label class="form-label">المحفظ</label><input type="text" class="form-control" id="certTeacher" placeholder="اسم المحفظ" onchange="updateCertPreview()"></div><div class="form-group"><label class="form-label">مدير الدار</label><input type="text" class="form-control" id="certDirector" placeholder="اسم المدير" onchange="updateCertPreview()"></div></div><div class="info-box ib-green"><i class="fas fa-info-circle"></i><div>سيتم إنشاء رمز QR تلقائياً لإمكانية التحقق من الشهادة إلكترونياً.</div></div><div style="display:flex;gap:10px"><button class="btn btn-primary" onclick="generateCertificate()"><i class="fas fa-print"></i> طباعة الشهادة</button><button class="btn btn-gold" onclick="downloadCertificatePDF()"><i class="fas fa-file-pdf"></i> تحميل PDF</button><button class="btn btn-outline" onclick="shareCertificate()"><i class="fas fa-share-alt"></i> مشاركة</button></div><div class="divider"></div><div class="cert-preview" id="certPreview" style="background:linear-gradient(145deg,#fefdf5 0%,#fffef0 100%);border:3px double var(--gold);border-radius:12px;padding:30px;text-align:center;position:relative"><div class="cert-logo" style="width:60px;height:60px;margin:0 auto 12px"><i class="fas fa-quran"></i></div><h3 style="color:var(--g1)">دار الإمام مالك لتحفيظ القرآن الكريم</h3><div class="divider" style="margin:10px 0"></div><h2 id="certPreviewTitle" style="color:var(--gold3)">شهادة إتمام حفظ جزء</h2><p>تشهد الدار بأن الطالب</p><h1 id="certPreviewStudent" style="color:var(--g1)">أحمد محمد العمري</h1><p>قد أتم بفضل الله تعالى وعونه<br>حفظ <strong id="certPreviewDetails">الجزء الثلاثين</strong><br>وذلك بمستوى <strong>ممتاز</strong> وإتقان تام</p><div class="cert-verse" style="margin:15px 0;padding:10px;border-top:1px solid var(--gold);border-bottom:1px solid var(--gold)">﴿ وَلَقَدْ يَسَّرْنَا الْقُرْآنَ لِلذِّكْرِ فَهَلْ مِن مُّدَّكِرٍ ﴾</div><div style="display:flex;justify-content:space-between;margin-top:20px"><div><div style="width:100px;height:1px;background:var(--gold);margin-bottom:4px"></div><div id="certPreviewTeacher" style="font-size:12px">المحفظ: ___________</div></div><div><div style="width:100px;height:1px;background:var(--gold);margin-bottom:4px"></div><div id="certPreviewDirector" style="font-size:12px">مدير الدار: ___________</div></div></div><div style="margin-top:15px;font-size:11px;color:var(--txtl)" id="certPreviewDate"></div><div style="position:absolute;bottom:10px;right:10px;width:50px;height:50px;background:var(--border);border-radius:4px;display:flex;align-items:center;justify-content:center"><i class="fas fa-qrcode" style="font-size:24px"></i></div></div></div></div>
+  <div id="pg-certificate" class="page"><div class="card"><div class="card-hdr"><h3><i class="fas fa-certificate"></i> إصدار شهادة</h3></div><div class="card-body"><div class="form-group"><label class="form-label">الطالب</label><select class="form-control" id="certStudentId"></select></div><div class="form-group"><label class="form-label">نوع الشهادة</label><select class="form-control" id="certType"><option>شهادة إتمام حفظ جزء</option><option>شهادة إتمام حفظ القرآن</option><option>شهادة تفوق</option></select></div><div class="form-group"><label class="form-label">التفاصيل</label><input type="text" class="form-control" id="certDetails" placeholder="مثال: الجزء الثلاثين"></div><button class="btn btn-primary" onclick="generateCertificate()"><i class="fas fa-print"></i> إنشاء شهادة</button></div></div></div>
 
   <!-- Competitions Page -->
-  <div id="pg-competitions" class="page"><div class="card"><div class="card-hdr"><h3><i class="fas fa-medal"></i> المسابقات</h3><button class="btn btn-primary" onclick="showAddCompetitionModal()"><i class="fas fa-plus"></i> مسابقة جديدة</button></div><div class="tbl-wrap"><table class="dtbl"><thead><tr><th>المسابقة</th><th>التاريخ</th><th>المشاركون</th><th>الحالة</th><th>الإجراءات</th></tr></thead><tbody id="competitionsTable"></tbody></table></div></div><div class="card"><div class="card-hdr"><h3><i class="fas fa-trophy"></i> الترتيب الحالي</h3></div><div class="card-body"><div id="competitionLeaderboard"></div></div></div></div>
+  <div id="pg-competitions" class="page"><div class="card"><div class="card-hdr"><h3><i class="fas fa-medal"></i> المسابقات</h3><button class="btn btn-primary" onclick="showAddCompetitionModal()"><i class="fas fa-plus"></i> مسابقة جديدة</button></div><div class="tbl-wrap"><table class="dtbl"><thead><tr><th>المسابقة</th><th>التاريخ</th><th>الحالة</th><th>الإجراءات</th> </thead><tbody id="competitionsTable"></tbody>}</div></div></div>
 
   <!-- Parent Portal -->
   <div id="pg-parent" class="page"><div class="card"><div class="card-hdr"><h3><i class="fas fa-users"></i> بوابة ولي الأمر</h3></div><div class="card-body"><div class="form-group"><label class="form-label">اختر الطالب</label><select class="form-control" id="parentStudentId" onchange="loadParentData()"></select></div><div id="parentData"></div></div></div></div>
 
-  <!-- Messages Page -->
-  <div id="pg-messages" class="page"><div class="card"><div class="card-hdr"><h3><i class="fas fa-envelope"></i> الرسائل</h3><button class="btn btn-primary" onclick="showSendMessageModal()"><i class="fas fa-plus"></i> رسالة جديدة</button></div><div class="tbl-wrap"><table class="dtbl"><thead><tr><th>من</th><th>إلى</th><th>الموضوع</th><th>التاريخ</th><th>الحالة</th><th>الإجراءات</th></tr></thead><tbody id="messagesTable"></tbody></table></div></div></div>
-
-  <!-- Finance Page -->
-  <div id="pg-finance" class="page"><div class="card"><div class="card-hdr"><h3><i class="fas fa-money-bill-wave"></i> المالية</h3><button class="btn btn-primary" onclick="showAddPaymentModal()"><i class="fas fa-plus"></i> تسجيل دفعة</button></div><div class="stats-grid stats-4" style="margin-bottom:22px"><div class="scard sc1"><div class="sc-info"><h3 id="totalIncome">0</h3><p>إجمالي الإيرادات</p></div><div class="sc-icon si1"><i class="fas fa-dollar-sign"></i></div></div><div class="scard sc2"><div class="sc-info"><h3 id="totalExpenses">0</h3><p>إجمالي المصروفات</p></div><div class="sc-icon si2"><i class="fas fa-chart-line"></i></div></div><div class="scard sc3"><div class="sc-info"><h3 id="totalBalance">0</h3><p>الرصيد الحالي</p></div><div class="sc-icon si3"><i class="fas fa-wallet"></i></div></div><div class="scard sc4"><div class="sc-info"><h3 id="pendingPayments">0</h3><p>مدفوعات مستحقة</p></div><div class="sc-icon si4"><i class="fas fa-clock"></i></div></div></div><div class="tbl-wrap"><table class="dtbl"><thead><tr><th>التاريخ</th><th>الطالب</th><th>النوع</th><th>المبلغ</th><th>الحالة</th><th>الإجراءات</th></tr></thead><tbody id="financeTable"></tbody></table></div></div>
-
   <!-- Reports Page -->
-  <div id="pg-reports" class="page"><div class="card"><div class="card-hdr"><h3><i class="fas fa-chart-bar"></i> التقارير المتقدمة</h3><div><button class="btn btn-gold btn-sm" onclick="exportToExcel()"><i class="fas fa-file-excel"></i> Excel</button><button class="btn btn-blue btn-sm" onclick="exportToPDF()"><i class="fas fa-file-pdf"></i> PDF</button><button class="btn btn-outline btn-sm" onclick="printReport()"><i class="fas fa-print"></i> طباعة</button></div></div><div class="card-body"><div class="report-filter-bar" style="display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap"><select class="form-control" id="reportType" style="width:150px" onchange="renderReports()"><option value="recitations">التسميعات</option><option value="attendance">الحضور</option><option value="grades">التقييمات</option><option value="financial">المالية</option></select><input type="date" class="form-control" id="reportStartDate" style="width:150px" onchange="renderReports()"><input type="date" class="form-control" id="reportEndDate" style="width:150px" onchange="renderReports()"><button class="btn btn-primary btn-sm" onclick="renderReports()"><i class="fas fa-chart-line"></i> عرض التقرير</button></div><canvas id="reportsChart" height="200"></canvas><div class="divider"></div><div class="tbl-wrap"><table class="dtbl" id="reportTable"><thead><tr><th>البيان</th><th>القيمة</th></tr></thead><tbody></tbody></table></div></div></div>
-
-  <!-- Settings Page -->
-  <div id="pg-settings" class="page"><div class="card"><div class="card-hdr"><h3><i class="fas fa-cog"></i> إعدادات النظام</h3></div><div class="card-body"><div class="form-group"><label class="form-label">اسم الدار</label><input type="text" class="form-control" id="settingDarName" value="دار الإمام مالك"></div><div class="form-group"><label class="form-label">اسم المدير</label><input type="text" class="form-control" id="settingDirectorName" value="محمد الأحمدي"></div><div class="form-group"><label class="form-label">الرسوم الشهرية</label><input type="number" class="form-control" id="settingMonthlyFee" value="150"></div><div class="form-group"><label class="form-label">لغة الواجهة</label><select class="form-control" id="settingLanguage"><option value="ar" selected>العربية</option><option value="en">English</option></select></div><button class="btn btn-primary" onclick="saveSettings()"><i class="fas fa-save"></i> حفظ الإعدادات</button><button class="btn btn-outline" onclick="resetSettings()"><i class="fas fa-undo"></i> استعادة الافتراضي</button><button class="btn btn-danger" onclick="resetAllData()"><i class="fas fa-database"></i> إعادة تعيين جميع البيانات</button></div></div></div>
+  <div id="pg-reports" class="page"><div class="card"><div class="card-hdr"><h3><i class="fas fa-chart-bar"></i> التقارير</h3></div><div class="card-body"><canvas id="reportsChart" height="200"></canvas><div class="divider"></div><div class="tbl-wrap"><table class="dtbl" id="reportTable"><thead><tr><th>البيان</th><th>القيمة</th></tr></thead><tbody></tbody></table></div></div></div></div>
 </main>
 
 <script>
-// ==================== DATA MODELS & STORAGE ====================
-let currentUser = { id: 1, name: 'محمد الأحمدي', role: 'مدير', avatar: 'م.أ' };
-let students = [], teachers = [], halaqas = [], recitations = [], attendances = [], competitions = [], messages = [], exams = [], rewards = [], payments = [], notifications = [];
-let charts = {};
+// ==================== DATA STORAGE ====================
+let students = [], teachers = [], halaqas = [], recitations = [], attendances = [], competitions = [], notifications = [];
 
 function loadData() {
   students = JSON.parse(localStorage.getItem('students') || '[]');
@@ -349,52 +286,34 @@ function loadData() {
   recitations = JSON.parse(localStorage.getItem('recitations') || '[]');
   attendances = JSON.parse(localStorage.getItem('attendances') || '[]');
   competitions = JSON.parse(localStorage.getItem('competitions') || '[]');
-  messages = JSON.parse(localStorage.getItem('messages') || '[]');
-  exams = JSON.parse(localStorage.getItem('exams') || '[]');
-  rewards = JSON.parse(localStorage.getItem('rewards') || '[]');
-  payments = JSON.parse(localStorage.getItem('payments') || '[]');
   notifications = JSON.parse(localStorage.getItem('notifications') || '[]');
   
   if(students.length === 0) initSampleData();
-  updateAllCounters();
+  updateCounters();
   updateNotificationsUI();
-  addNotification('تم تحميل النظام بنجاح', 'success');
 }
 
 function initSampleData() {
   students = [
-    { id: 1, name: 'أحمد محمد العمري', halaqaId: 1, juzMemorized: 15, points: 2450, attendance: 95, parentPhone: '0501234567', parentName: 'محمد العمري', joinDate: '2022-09-10' },
-    { id: 2, name: 'عبدالله خالد السالم', halaqaId: 2, juzMemorized: 12, points: 2180, attendance: 92, parentPhone: '0501234568', parentName: 'خالد السالم', joinDate: '2022-10-15' },
-    { id: 3, name: 'يوسف سعد الدوسري', halaqaId: 3, juzMemorized: 8, points: 1650, attendance: 88, parentPhone: '0501234569', parentName: 'سعد الدوسري', joinDate: '2023-01-20' },
-    { id: 4, name: 'محمد عبدالرحمن الحربي', halaqaId: 4, juzMemorized: 10, points: 1920, attendance: 96, parentPhone: '0501234570', parentName: 'عبدالرحمن الحربي', joinDate: '2022-11-05' },
-    { id: 5, name: 'فيصل خالد القحطاني', halaqaId: 1, juzMemorized: 6, points: 1430, attendance: 89, parentPhone: '0501234571', parentName: 'خالد القحطاني', joinDate: '2023-02-28' },
+    { id: 1, name: 'أحمد محمد العمري', halaqaId: 1, juzMemorized: 15, points: 2450, attendance: 95 },
+    { id: 2, name: 'عبدالله خالد السالم', halaqaId: 2, juzMemorized: 12, points: 2180, attendance: 92 },
+    { id: 3, name: 'يوسف سعد الدوسري', halaqaId: 1, juzMemorized: 8, points: 1650, attendance: 88 },
+    { id: 4, name: 'محمد الحربي', halaqaId: 2, juzMemorized: 10, points: 1920, attendance: 96 },
   ];
   teachers = [
-    { id: 1, name: 'الشيخ عبدالله الأحمدي', halaqaId: 1, studentsCount: 14, status: 'نشط', phone: '0501111111', joinDate: '2022-08-01' },
-    { id: 2, name: 'الشيخ محمد السالم', halaqaId: 2, studentsCount: 12, status: 'نشط', phone: '0502222222', joinDate: '2022-09-01' },
-    { id: 3, name: 'الشيخ فهد الدوسري', halaqaId: 3, studentsCount: 15, status: 'نشط', phone: '0503333333', joinDate: '2022-10-01' },
-    { id: 4, name: 'الشيخ خالد العتيبي', halaqaId: 4, studentsCount: 10, status: 'نشط', phone: '0504444444', joinDate: '2023-01-15' },
+    { id: 1, name: 'الشيخ عبدالله الأحمدي', status: 'نشط' },
+    { id: 2, name: 'الشيخ محمد السالم', status: 'نشط' },
   ];
   halaqas = [
-    { id: 1, name: 'حلقة الفاتحين', teacherId: 1, location: 'القاعة الرئيسية', status: 'نشطة', maxStudents: 15, schedule: 'السبت - الأربعاء 4-6م' },
-    { id: 2, name: 'حلقة النور', teacherId: 2, location: 'القاعة الشرقية', status: 'نشطة', maxStudents: 15, schedule: 'الأحد - الخميس 4-6م' },
-    { id: 3, name: 'حلقة الإخلاص', teacherId: 3, location: 'القاعة الغربية', status: 'نشطة', maxStudents: 15, schedule: 'السبت - الأربعاء 5-7م' },
-    { id: 4, name: 'حلقة الرحمن', teacherId: 4, location: 'القاعة الشمالية', status: 'نشطة', maxStudents: 15, schedule: 'الأحد - الخميس 3-5م' },
+    { id: 1, name: 'حلقة الفاتحين', location: 'القاعة الرئيسية', teacherId: 1 },
+    { id: 2, name: 'حلقة النور', location: 'القاعة الشرقية', teacherId: 2 },
   ];
   let today = new Date().toISOString().split('T')[0];
   recitations = [
-    { id: 1, studentId: 1, type: 'new', surah: 'البقرة', verses: '142-145', grade: 'ممتاز', score: 95, tajweedErrors: 0, pronunciationErrors: 0, memorizationErrors: 0, notes: '', date: today },
-    { id: 2, studentId: 2, type: 'near', surah: 'آل عمران', verses: '1-20', grade: 'جيد جداً', score: 85, tajweedErrors: 2, pronunciationErrors: 1, memorizationErrors: 0, notes: '', date: today },
-    { id: 3, studentId: 3, type: 'new', surah: 'النساء', verses: '23-28', grade: 'جيد', score: 75, tajweedErrors: 4, pronunciationErrors: 2, memorizationErrors: 1, notes: '', date: today },
-    { id: 4, studentId: 4, type: 'far', surah: 'المائدة', verses: '1-10', grade: 'ممتاز', score: 92, tajweedErrors: 1, pronunciationErrors: 0, memorizationErrors: 1, notes: '', date: today },
-    { id: 5, studentId: 1, type: 'near', surah: 'آل عمران', verses: '80-100', grade: 'جيد جداً', score: 88, tajweedErrors: 3, pronunciationErrors: 1, memorizationErrors: 0, notes: '', date: '2024-12-14' },
+    { id: 1, studentId: 1, surah: 'البقرة', verses: '142-145', grade: 'ممتاز', score: 95, date: today },
+    { id: 2, studentId: 2, surah: 'آل عمران', verses: '1-20', grade: 'جيد جداً', score: 85, date: today },
   ];
-  attendances = students.map(s => ({ id: Date.now() + s.id, studentId: s.id, date: today, status: 'حاضر', note: '' }));
-  competitions = [];
-  messages = [];
-  exams = [];
-  rewards = [];
-  payments = students.map(s => ({ id: Date.now() + s.id, studentId: s.id, amount: 150, date: '2024-12-01', status: 'مدفوع', type: 'رسوم شهرية' }));
+  attendances = students.map(s => ({ studentId: s.id, date: today, status: 'حاضر', note: '' }));
   saveAllData();
 }
 
@@ -405,68 +324,50 @@ function saveAllData() {
   localStorage.setItem('recitations', JSON.stringify(recitations));
   localStorage.setItem('attendances', JSON.stringify(attendances));
   localStorage.setItem('competitions', JSON.stringify(competitions));
-  localStorage.setItem('messages', JSON.stringify(messages));
-  localStorage.setItem('exams', JSON.stringify(exams));
-  localStorage.setItem('rewards', JSON.stringify(rewards));
-  localStorage.setItem('payments', JSON.stringify(payments));
   localStorage.setItem('notifications', JSON.stringify(notifications));
 }
 
-function updateAllCounters() {
-  document.getElementById('studentsCount')?.innerText = students.length;
-  document.getElementById('teachersCount')?.innerText = teachers.length;
-  document.getElementById('halaqasCount')?.innerText = halaqas.length;
-  document.getElementById('statStudents')?.innerText = students.length;
-  document.getElementById('statTeachers')?.innerText = teachers.length;
-  document.getElementById('statHalaqas')?.innerText = halaqas.filter(h => h.status === 'نشطة').length;
-  let totalAttendance = students.reduce((sum, s) => sum + s.attendance, 0);
-  let avgAttendance = students.length ? Math.round(totalAttendance / students.length) : 0;
-  document.getElementById('statAttendance')?.innerText = avgAttendance + '%';
+function updateCounters() {
+  document.getElementById('studentsCount').innerText = students.length;
+  document.getElementById('teachersCount').innerText = teachers.length;
+  document.getElementById('halaqasCount').innerText = halaqas.length;
+  document.getElementById('statStudents').innerText = students.length;
+  document.getElementById('statTeachers').innerText = teachers.length;
+  document.getElementById('statHalaqas').innerText = halaqas.length;
+  let avgAttendance = students.length ? Math.round(students.reduce((s,sum)=>s+sum.attendance,0)/students.length) : 0;
+  document.getElementById('statAttendance').innerText = avgAttendance + '%';
   let today = new Date().toISOString().split('T')[0];
-  let todayRecs = recitations.filter(r => r.date === today).length;
-  document.getElementById('todayRecitations')?.innerText = todayRecs;
-  document.getElementById('activeHalaqas')?.innerText = halaqas.filter(h => h.status === 'نشطة').length;
-  let todayAbsent = attendances.filter(a => a.date === today && a.status === 'غائب').length;
-  document.getElementById('todayPresent')?.innerText = students.length - todayAbsent;
-  document.getElementById('todayAbsent')?.innerText = todayAbsent;
-  document.getElementById('messagesCount')?.innerText = messages.filter(m => !m.read).length;
+  document.getElementById('todayRecitations').innerText = recitations.filter(r=>r.date===today).length;
 }
 
-function addNotification(message, type = 'info') {
-  notifications.unshift({ id: Date.now(), message, type, date: new Date(), read: false });
-  if(notifications.length > 100) notifications.pop();
+function addNotification(message) {
+  notifications.unshift({ id: Date.now(), message, date: new Date(), read: false });
+  if(notifications.length > 50) notifications.pop();
   localStorage.setItem('notifications', JSON.stringify(notifications));
   updateNotificationsUI();
-  showToast(message, type);
+  showToast(message);
 }
 
 function updateNotificationsUI() {
-  let unread = notifications.filter(n => !n.read).length;
-  document.getElementById('notifCount')?.innerText = unread;
+  let unread = notifications.filter(n=>!n.read).length;
+  document.getElementById('notifCount').innerText = unread;
   let container = document.getElementById('notifList');
-  if(container) container.innerHTML = notifications.slice(0, 20).map(n => `<div class="nitem ${!n.read ? 'unread' : ''}" onclick="markNotifRead(${n.id})"><div class="nitem-icon ni-${n.type === 'error' ? 'red' : n.type === 'success' ? 'grn' : 'blu'}"><i class="fas fa-${n.type === 'error' ? 'exclamation-circle' : n.type === 'success' ? 'check-circle' : 'info-circle'}"></i></div><div class="nitem-body"><div class="title">${n.message}</div><div class="time">${new Date(n.date).toLocaleTimeString('ar-EG')}</div></div></div>`).join('');
+  if(container) container.innerHTML = notifications.slice(0,10).map(n=>`<div class="nitem ${!n.read?'unread':''}" onclick="markNotifRead(${n.id})"><div class="nitem-icon ni-grn"><i class="fas fa-info-circle"></i></div><div class="nitem-body"><div class="title">${n.message}</div><div class="time">منذ قليل</div></div></div>`).join('');
 }
 
 function markNotifRead(id) {
-  let n = notifications.find(n => n.id === id);
+  let n = notifications.find(n=>n.id===id);
   if(n) n.read = true;
   localStorage.setItem('notifications', JSON.stringify(notifications));
   updateNotificationsUI();
 }
 
-function clearAllNotifications() {
-  notifications = [];
-  localStorage.setItem('notifications', JSON.stringify(notifications));
-  updateNotificationsUI();
-  showToast('تم مسح جميع الإشعارات', 'success');
-}
-
-function showToast(message, type = 'success') {
+function showToast(message, type='success') {
   let toast = document.createElement('div');
   toast.className = `toast-msg toast-${type}`;
-  toast.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i> ${message}`;
+  toast.innerHTML = `<i class="fas fa-${type==='success'?'check-circle':'info-circle'}"></i> ${message}`;
   document.body.appendChild(toast);
-  setTimeout(() => toast.remove(), 3000);
+  setTimeout(()=>toast.remove(), 3000);
 }
 
 function showLoading(show) { document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none'; }
@@ -481,741 +382,304 @@ function showModal(title, body, onConfirm) {
 function closeModal() { document.getElementById('modalDialog').classList.remove('show'); }
 
 // ==================== NAVIGATION ====================
-function showPage(page, el) {
+function showPage(page) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.ni').forEach(n => n.classList.remove('active'));
-  let pg = document.getElementById('pg-' + page);
-  if(pg) pg.classList.add('active');
-  if(el) el.classList.add('active');
-  const titles = { dashboard:'لوحة التحكم', students:'الطلاب', teachers:'المحفظون', halaqas:'الحلقات', recitation:'التسميع', progress:'تقدم الحفظ', attendance:'الحضور', exams:'الاختبارات', rewards:'المكافآت', certificate:'الشهادات', competitions:'المسابقات', parent:'بوابة ولي الأمر', messages:'الرسائل', finance:'المالية', reports:'التقارير', settings:'الإعدادات' };
-  document.getElementById('pageTitle').innerText = titles[page] || page;
-  document.getElementById('pageCrumb').innerText = titles[page] || page;
+  document.getElementById('pg-' + page).classList.add('active');
+  let activeNav = Array.from(document.querySelectorAll('.ni')).find(n => n.getAttribute('onclick')?.includes(`'${page}'`));
+  if(activeNav) activeNav.classList.add('active');
+  const titles = {dashboard:'لوحة التحكم',students:'الطلاب',teachers:'المحفظون',halaqas:'الحلقات',recitation:'التسميع',progress:'تقدم الحفظ',attendance:'الحضور',certificate:'الشهادات',competitions:'المسابقات',parent:'بوابة ولي الأمر',reports:'التقارير'};
+  document.getElementById('pageTitle').innerText = titles[page];
+  document.getElementById('pageCrumb').innerText = titles[page];
   refreshPageData(page);
-  if(window.innerWidth < 768) toggleSB();
+  if(window.innerWidth<768) toggleSB();
 }
 
 function refreshPageData(page) {
   if(page === 'dashboard') renderDashboard();
-  else if(page === 'students') renderStudentsTable();
-  else if(page === 'teachers') renderTeachersTable();
-  else if(page === 'halaqas') renderHalaqasTable();
-  else if(page === 'recitation') { renderRecStudentsSelect(); renderRecHistory(); loadStudentPerformanceChart(); }
-  else if(page === 'attendance') { renderAttendanceTable(); renderAttendanceChart(); }
-  else if(page === 'exams') renderExamsTable();
-  else if(page === 'rewards') { renderRewardsTable(); renderPointsChart(); }
-  else if(page === 'certificate') renderCertStudentsSelect();
-  else if(page === 'competitions') { renderCompetitionsTable(); renderCompetitionLeaderboard(); }
-  else if(page === 'parent') { renderParentStudentsSelect(); loadParentData(); }
-  else if(page === 'messages') renderMessagesTable();
-  else if(page === 'finance') { renderFinanceTable(); updateFinanceStats(); }
+  else if(page === 'students') renderStudents();
+  else if(page === 'teachers') renderTeachers();
+  else if(page === 'halaqas') renderHalaqas();
+  else if(page === 'recitation') { renderRecStudents(); renderRecHistory(); }
+  else if(page === 'attendance') renderAttendance();
+  else if(page === 'certificate') renderCertStudents();
+  else if(page === 'competitions') renderCompetitions();
+  else if(page === 'parent') { renderParentStudents(); loadParentData(); }
+  else if(page === 'progress') { renderProgressSelect(); renderQuranMap(); }
   else if(page === 'reports') renderReports();
-  else if(page === 'progress') { renderProgressStudentSelect(); renderQuranMap(); }
-  else if(page === 'settings') loadSettings();
 }
 
 function toggleSB() { document.getElementById('sidebar').classList.toggle('open'); document.getElementById('sbOvr').classList.toggle('show'); }
 function toggleNotif() { document.getElementById('ndrop').classList.toggle('show'); }
-function globalSearch() { let term = document.getElementById('globalSearch').value.toLowerCase(); if(term) showToast(`البحث عن: ${term}`, 'info'); }
-function logout() { showModal('تسجيل الخروج', 'هل أنت متأكد من تسجيل الخروج؟', () => { showToast('تم تسجيل الخروج بنجاح', 'success'); }); }
-function showUserMenu() { showToast(`مرحباً ${currentUser.name}`, 'info'); }
-function refreshLeaderboard() { renderDashboard(); showToast('تم تحديث قائمة أفضل الطلاب', 'success'); }
+function globalSearch() { let term = document.getElementById('globalSearch').value; if(term) showToast(`بحث: ${term}`); }
+function logout() { showModal('تسجيل الخروج', 'هل أنت متأكد؟', () => showToast('تم تسجيل الخروج')); }
 
 // ==================== DASHBOARD ====================
 function renderDashboard() {
-  document.getElementById('currentDate').innerHTML = new Date().toLocaleDateString('ar-SA', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+  document.getElementById('currentDate').innerHTML = new Date().toLocaleDateString('ar-SA', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
   document.getElementById('currentGregorian').innerHTML = new Date().toLocaleDateString('ar-EG');
-  let recent = [...recitations].sort((a,b) => b.id - a.id).slice(0,8);
-  document.getElementById('recentRecitations').innerHTML = recent.map(r => {
-    let s = students.find(st => st.id === r.studentId);
-    return `<tr><td><div class="cell-user"><div class="av-sm" style="background:linear-gradient(135deg,var(--g4),var(--g2))">${s?.name?.charAt(0) || 'ط'}</div><div>${s?.name || 'غير معروف'}</div></div></td><td>${r.surah} ${r.verses}</td><td><span class="g-exc">${r.grade}</span></td><td>${r.score}</td><td>${r.date}</td></tr>`;
+  let recent = [...recitations].sort((a,b)=>b.id-a.id).slice(0,5);
+  document.getElementById('recentRecitations').innerHTML = recent.map(r=>{
+    let s = students.find(st=>st.id===r.studentId);
+    return `<tr><td><div class="cell-user"><div class="av-sm" style="background:var(--g4)">${s?.name?.charAt(0)}</div><div>${s?.name}</div></div></td><td>${r.surah} ${r.verses}</td><td><span class="g-exc">${r.grade}</span></td><td>${r.date}</td></tr>`;
   }).join('');
-  let top = [...students].sort((a,b) => b.points - a.points).slice(0,5);
-  document.getElementById('topStudents').innerHTML = top.map((s,i) => `<li class="ts-item"><div class="rank-badge ${i===0?'rk1':i===1?'rk2':i===2?'rk3':'rk-oth'}">${i+1}</div><div class="ts-info"><div class="nm">${s.name}</div><div class="dt">${s.juzMemorized} جزء محفوظ</div></div><div class="ts-pts">${s.points} نقطة</div></li>`).join('');
-  let activeHalaqasHtml = halaqas.filter(h => h.status === 'نشطة').slice(0,4).map(h => {
-    let teacher = teachers.find(t => t.id === h.teacherId);
-    let studentCount = students.filter(s => s.halaqaId === h.id).length;
-    return `<div class="hq-card"><div class="hq-name"><i class="fas fa-circle" style="font-size:7px;color:#22c55e"></i>${h.name}</div><div class="hq-teacher"><i class="fas fa-user"></i> ${teacher?.name || 'غير معين'}</div><div class="hq-foot"><span><i class="fas fa-users"></i> ${studentCount}/${h.maxStudents}</span><span class="badge b-green">نشطة</span></div></div>`;
-  }).join('');
-  document.getElementById('activeHalaqasList').innerHTML = activeHalaqasHtml;
+  let top = [...students].sort((a,b)=>b.points-a.points).slice(0,5);
+  document.getElementById('topStudents').innerHTML = top.map((s,i)=>`<li class="ts-item"><div class="rank-badge ${i===0?'rk1':i===1?'rk2':i===2?'rk3':'rk-oth'}">${i+1}</div><div class="ts-info"><div class="nm">${s.name}</div></div><div class="ts-pts">${s.points}</div></li>`).join('');
 }
 
-// ==================== STUDENTS CRUD ====================
-function renderStudentsTable() {
-  document.getElementById('studentsTable').innerHTML = students.map((s,i) => `<tr><td>${i+1}</td><td><div class="cell-user"><div class="av-sm" style="background:linear-gradient(135deg,var(--g4),var(--g2))">${s.name.charAt(0)}</div><div>${s.name}</div></div></td><td>${halaqas.find(h=>h.id===s.halaqaId)?.name || 'غير محدد'}</td><td>${s.juzMemorized}</td><td>${s.attendance}%</td><td>${s.points}</td><td><button class="btn btn-outline btn-sm" onclick="editStudent(${s.id})"><i class="fas fa-edit"></i></button> <button class="btn btn-danger btn-sm" onclick="deleteStudent(${s.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('');
+// ==================== STUDENTS ====================
+function renderStudents() {
+  document.getElementById('studentsTable').innerHTML = students.map((s,i)=>`<tr><td>${i+1}</td><td><div class="cell-user"><div class="av-sm" style="background:var(--g4)">${s.name.charAt(0)}</div><div>${s.name}</div></div></td><td>${s.juzMemorized}</td><td>${s.points}</td><td><button class="btn btn-outline btn-sm" onclick="editStudent(${s.id})"><i class="fas fa-edit"></i></button> <button class="btn btn-danger btn-sm" onclick="deleteStudent(${s.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('');
 }
 
 function showAddStudentModal() {
-  let halaqasOptions = halaqas.map(h => `<option value="${h.id}">${h.name}</option>`).join('');
-  showModal('إضافة طالب جديد', `<div class="form-group"><label class="form-label">الاسم الكامل <span class="req">*</span></label><input type="text" class="form-control" id="studentName"></div><div class="form-row cols-2"><div class="form-group"><label class="form-label">الحلقة</label><select class="form-control" id="studentHalaqa">${halaqasOptions}</select></div><div class="form-group"><label class="form-label">رقم ولي الأمر</label><input type="text" class="form-control" id="studentPhone"></div></div><div class="form-row cols-2"><div class="form-group"><label class="form-label">اسم ولي الأمر</label><input type="text" class="form-control" id="studentParentName"></div><div class="form-group"><label class="form-label">تاريخ الالتحاق</label><input type="date" class="form-control" id="studentJoinDate" value="${new Date().toISOString().split('T')[0]}"></div></div>`, () => {
+  showModal('إضافة طالب', `<div class="form-group"><label>الاسم</label><input type="text" class="form-control" id="studentName"></div>`, () => {
     let name = document.getElementById('studentName').value;
-    if(!name) { showToast('الرجاء إدخال اسم الطالب', 'error'); return; }
-    let newId = Math.max(0, ...students.map(s => s.id), 0) + 1;
-    students.push({ id: newId, name, halaqaId: parseInt(document.getElementById('studentHalaqa').value), juzMemorized: 0, points: 0, attendance: 100, parentPhone: document.getElementById('studentPhone').value, parentName: document.getElementById('studentParentName').value, joinDate: document.getElementById('studentJoinDate').value });
+    if(!name) { showToast('أدخل اسم الطالب', 'error'); return; }
+    let newId = Math.max(0,...students.map(s=>s.id),0)+1;
+    students.push({ id: newId, name, halaqaId: 1, juzMemorized: 0, points: 0, attendance: 100 });
     saveAllData();
-    renderStudentsTable();
-    updateAllCounters();
-    addNotification(`تم إضافة الطالب ${name}`, 'success');
+    renderStudents();
+    updateCounters();
+    addNotification(`تم إضافة الطالب ${name}`);
   });
 }
 
 function editStudent(id) {
-  let s = students.find(s => s.id === id);
-  if(!s) return;
-  let halaqasOptions = halaqas.map(h => `<option value="${h.id}" ${s.halaqaId === h.id ? 'selected' : ''}>${h.name}</option>`).join('');
-  showModal('تعديل بيانات الطالب', `<div class="form-group"><label class="form-label">الاسم الكامل</label><input type="text" class="form-control" id="studentName" value="${s.name}"></div><div class="form-row cols-2"><div class="form-group"><label class="form-label">الحلقة</label><select class="form-control" id="studentHalaqa">${halaqasOptions}</select></div><div class="form-group"><label class="form-label">الأجزاء المحفوظة</label><input type="number" class="form-control" id="studentJuz" value="${s.juzMemorized}"></div></div><div class="form-row cols-2"><div class="form-group"><label class="form-label">رقم ولي الأمر</label><input type="text" class="form-control" id="studentPhone" value="${s.parentPhone || ''}"></div><div class="form-group"><label class="form-label">اسم ولي الأمر</label><input type="text" class="form-control" id="studentParentName" value="${s.parentName || ''}"></div></div>`, () => {
+  let s = students.find(s=>s.id===id);
+  showModal('تعديل طالب', `<div class="form-group"><label>الاسم</label><input type="text" class="form-control" id="studentName" value="${s.name}"></div><div class="form-group"><label>الأجزاء</label><input type="number" class="form-control" id="studentJuz" value="${s.juzMemorized}"></div>`, () => {
     s.name = document.getElementById('studentName').value;
-    s.halaqaId = parseInt(document.getElementById('studentHalaqa').value);
     s.juzMemorized = parseInt(document.getElementById('studentJuz').value);
-    s.parentPhone = document.getElementById('studentPhone').value;
-    s.parentName = document.getElementById('studentParentName').value;
     saveAllData();
-    renderStudentsTable();
-    updateAllCounters();
-    addNotification(`تم تحديث بيانات الطالب ${s.name}`, 'success');
+    renderStudents();
+    addNotification(`تم تحديث بيانات ${s.name}`);
   });
 }
 
 function deleteStudent(id) {
-  let s = students.find(s => s.id === id);
-  showModal('حذف طالب', `هل أنت متأكد من حذف الطالب <strong>${s?.name}</strong>؟`, () => {
-    students = students.filter(s => s.id !== id);
+  let s = students.find(s=>s.id===id);
+  showModal('حذف طالب', `حذف ${s?.name}؟`, () => {
+    students = students.filter(s=>s.id!==id);
     saveAllData();
-    renderStudentsTable();
-    updateAllCounters();
-    addNotification(`تم حذف الطالب ${s?.name}`, 'error');
+    renderStudents();
+    updateCounters();
+    addNotification(`تم حذف ${s?.name}`);
   });
 }
 
-// ==================== TEACHERS CRUD ====================
-function renderTeachersTable() {
-  document.getElementById('teachersTable').innerHTML = teachers.map((t,i) => `<tr><td>${i+1}</td><td>${t.name}</td><td>${halaqas.find(h=>h.id===t.halaqaId)?.name || 'غير محدد'}</td><td>${students.filter(s=>s.halaqaId===t.halaqaId).length}</td><td><span class="badge b-green">${t.status}</span></td><td><button class="btn btn-outline btn-sm" onclick="editTeacher(${t.id})"><i class="fas fa-edit"></i></button> <button class="btn btn-danger btn-sm" onclick="deleteTeacher(${t.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('');
+// ==================== TEACHERS ====================
+function renderTeachers() {
+  document.getElementById('teachersTable').innerHTML = teachers.map((t,i)=>`<tr><td>${i+1}</td><td>${t.name}</td><td><span class="badge b-green">${t.status}</span></td><td><button class="btn btn-outline btn-sm" onclick="editTeacher(${t.id})"><i class="fas fa-edit"></i></button> <button class="btn btn-danger btn-sm" onclick="deleteTeacher(${t.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('');
 }
 
 function showAddTeacherModal() {
-  let halaqasOptions = `<option value="">غير معين</option>` + halaqas.map(h => `<option value="${h.id}">${h.name}</option>`).join('');
-  showModal('إضافة محفظ جديد', `<div class="form-group"><label class="form-label">الاسم الكامل <span class="req">*</span></label><input type="text" class="form-control" id="teacherName"></div><div class="form-row cols-2"><div class="form-group"><label class="form-label">الحلقة</label><select class="form-control" id="teacherHalaqa">${halaqasOptions}</select></div><div class="form-group"><label class="form-label">رقم الهاتف</label><input type="text" class="form-control" id="teacherPhone"></div></div>`, () => {
+  showModal('إضافة محفظ', `<div class="form-group"><label>الاسم</label><input type="text" class="form-control" id="teacherName"></div>`, () => {
     let name = document.getElementById('teacherName').value;
-    if(!name) { showToast('الرجاء إدخال اسم المحفظ', 'error'); return; }
-    let newId = Math.max(0, ...teachers.map(t => t.id), 0) + 1;
-    let halaqaId = document.getElementById('teacherHalaqa').value;
-    teachers.push({ id: newId, name, halaqaId: halaqaId ? parseInt(halaqaId) : null, studentsCount: 0, status: 'نشط', phone: document.getElementById('teacherPhone').value, joinDate: new Date().toISOString().split('T')[0] });
+    if(!name) { showToast('أدخل الاسم', 'error'); return; }
+    let newId = Math.max(0,...teachers.map(t=>t.id),0)+1;
+    teachers.push({ id: newId, name, status: 'نشط' });
     saveAllData();
-    renderTeachersTable();
-    updateAllCounters();
-    addNotification(`تم إضافة المحفظ ${name}`, 'success');
-  });
-}
-
-function editTeacher(id) {
-  let t = teachers.find(t => t.id === id);
-  if(!t) return;
-  let halaqasOptions = `<option value="">غير معين</option>` + halaqas.map(h => `<option value="${h.id}" ${t.halaqaId === h.id ? 'selected' : ''}>${h.name}</option>`).join('');
-  showModal('تعديل بيانات المحفظ', `<div class="form-group"><label class="form-label">الاسم الكامل</label><input type="text" class="form-control" id="teacherName" value="${t.name}"></div><div class="form-row cols-2"><div class="form-group"><label class="form-label">الحلقة</label><select class="form-control" id="teacherHalaqa">${halaqasOptions}</select></div><div class="form-group"><label class="form-label">رقم الهاتف</label><input type="text" class="form-control" id="teacherPhone" value="${t.phone || ''}"></div></div><div class="form-group"><label class="form-label">الحالة</label><select class="form-control" id="teacherStatus"><option value="نشط" ${t.status === 'نشط' ? 'selected' : ''}>نشط</option><option value="غير نشط" ${t.status === 'غير نشط' ? 'selected' : ''}>غير نشط</option></select></div>`, () => {
-    t.name = document.getElementById('teacherName').value;
-    let halaqaId = document.getElementById('teacherHalaqa').value;
-    t.halaqaId = halaqaId ? parseInt(halaqaId) : null;
-    t.phone = document.getElementById('teacherPhone').value;
-    t.status = document.getElementById('teacherStatus').value;
-    saveAllData();
-    renderTeachersTable();
-    addNotification(`تم تحديث بيانات المحفظ ${t.name}`, 'success');
+    renderTeachers();
+    updateCounters();
+    addNotification(`تم إضافة المحفظ ${name}`);
   });
 }
 
 function deleteTeacher(id) {
-  let t = teachers.find(t => t.id === id);
-  showModal('حذف محفظ', `هل أنت متأكد من حذف المحفظ <strong>${t?.name}</strong>؟`, () => {
-    teachers = teachers.filter(t => t.id !== id);
-    saveAllData();
-    renderTeachersTable();
-    updateAllCounters();
-    addNotification(`تم حذف المحفظ ${t?.name}`, 'error');
-  });
+  teachers = teachers.filter(t=>t.id!==id);
+  saveAllData();
+  renderTeachers();
+  updateCounters();
 }
 
-// ==================== HALAQAS CRUD ====================
-function renderHalaqasTable() {
-  document.getElementById('halaqasTable').innerHTML = halaqas.map((h,i) => `<tr><td>${i+1}</td><td>${h.name}</td><td>${teachers.find(t=>t.id===h.teacherId)?.name || 'غير معين'}</td><td>${students.filter(s=>s.halaqaId===h.id).length}</td><td>${h.location}</td><td><span class="badge b-green">${h.status}</span></td><td><button class="btn btn-outline btn-sm" onclick="editHalaqa(${h.id})"><i class="fas fa-edit"></i></button> <button class="btn btn-danger btn-sm" onclick="deleteHalaqa(${h.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('');
+// ==================== HALAQAS ====================
+function renderHalaqas() {
+  document.getElementById('halaqasTable').innerHTML = halaqas.map((h,i)=>`<tr><td>${i+1}</td><td>${h.name}</td><td>${h.location}</td><td><button class="btn btn-outline btn-sm" onclick="editHalaqa(${h.id})"><i class="fas fa-edit"></i></button> <button class="btn btn-danger btn-sm" onclick="deleteHalaqa(${h.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('');
 }
 
 function showAddHalaqaModal() {
-  let teachersOptions = `<option value="">غير معين</option>` + teachers.map(t => `<option value="${t.id}">${t.name}</option>`).join('');
-  showModal('إضافة حلقة جديدة', `<div class="form-group"><label class="form-label">اسم الحلقة <span class="req">*</span></label><input type="text" class="form-control" id="halaqaName"></div><div class="form-row cols-2"><div class="form-group"><label class="form-label">المحفظ</label><select class="form-control" id="halaqaTeacher">${teachersOptions}</select></div><div class="form-group"><label class="form-label">الموقع</label><input type="text" class="form-control" id="halaqaLoc"></div></div><div class="form-row cols-2"><div class="form-group"><label class="form-label">الحد الأقصى للطلاب</label><input type="number" class="form-control" id="halaqaMax" value="15"></div><div class="form-group"><label class="form-label">المواعيد</label><input type="text" class="form-control" id="halaqaSchedule" placeholder="مثال: السبت - الأربعاء 4-6م"></div></div>`, () => {
+  showModal('إضافة حلقة', `<div class="form-group"><label>الاسم</label><input type="text" class="form-control" id="halaqaName"></div><div class="form-group"><label>الموقع</label><input type="text" class="form-control" id="halaqaLoc"></div>`, () => {
     let name = document.getElementById('halaqaName').value;
-    if(!name) { showToast('الرجاء إدخال اسم الحلقة', 'error'); return; }
-    let newId = Math.max(0, ...halaqas.map(h => h.id), 0) + 1;
-    let teacherId = document.getElementById('halaqaTeacher').value;
-    halaqas.push({ id: newId, name, teacherId: teacherId ? parseInt(teacherId) : null, location: document.getElementById('halaqaLoc').value, status: 'نشطة', maxStudents: parseInt(document.getElementById('halaqaMax').value), schedule: document.getElementById('halaqaSchedule').value });
+    if(!name) { showToast('أدخل الاسم', 'error'); return; }
+    let newId = Math.max(0,...halaqas.map(h=>h.id),0)+1;
+    halaqas.push({ id: newId, name, location: document.getElementById('halaqaLoc').value, teacherId: null });
     saveAllData();
-    renderHalaqasTable();
-    updateAllCounters();
-    addNotification(`تم إضافة الحلقة ${name}`, 'success');
-  });
-}
-
-function editHalaqa(id) {
-  let h = halaqas.find(h => h.id === id);
-  if(!h) return;
-  let teachersOptions = `<option value="">غير معين</option>` + teachers.map(t => `<option value="${t.id}" ${h.teacherId === t.id ? 'selected' : ''}>${t.name}</option>`).join('');
-  showModal('تعديل بيانات الحلقة', `<div class="form-group"><label class="form-label">اسم الحلقة</label><input type="text" class="form-control" id="halaqaName" value="${h.name}"></div><div class="form-row cols-2"><div class="form-group"><label class="form-label">المحفظ</label><select class="form-control" id="halaqaTeacher">${teachersOptions}</select></div><div class="form-group"><label class="form-label">الموقع</label><input type="text" class="form-control" id="halaqaLoc" value="${h.location}"></div></div><div class="form-row cols-2"><div class="form-group"><label class="form-label">الحد الأقصى للطلاب</label><input type="number" class="form-control" id="halaqaMax" value="${h.maxStudents}"></div><div class="form-group"><label class="form-label">الحالة</label><select class="form-control" id="halaqaStatus"><option value="نشطة" ${h.status === 'نشطة' ? 'selected' : ''}>نشطة</option><option value="مغلقة" ${h.status === 'مغلقة' ? 'selected' : ''}>مغلقة</option></select></div></div>`, () => {
-    h.name = document.getElementById('halaqaName').value;
-    let teacherId = document.getElementById('halaqaTeacher').value;
-    h.teacherId = teacherId ? parseInt(teacherId) : null;
-    h.location = document.getElementById('halaqaLoc').value;
-    h.maxStudents = parseInt(document.getElementById('halaqaMax').value);
-    h.status = document.getElementById('halaqaStatus').value;
-    saveAllData();
-    renderHalaqasTable();
-    addNotification(`تم تحديث بيانات الحلقة ${h.name}`, 'success');
+    renderHalaqas();
+    updateCounters();
+    addNotification(`تم إضافة الحلقة ${name}`);
   });
 }
 
 function deleteHalaqa(id) {
-  let h = halaqas.find(h => h.id === id);
-  showModal('حذف حلقة', `هل أنت متأكد من حذف الحلقة <strong>${h?.name}</strong>؟`, () => {
-    halaqas = halaqas.filter(h => h.id !== id);
-    saveAllData();
-    renderHalaqasTable();
-    updateAllCounters();
-    addNotification(`تم حذف الحلقة ${h?.name}`, 'error');
-  });
+  halaqas = halaqas.filter(h=>h.id!==id);
+  saveAllData();
+  renderHalaqas();
+  updateCounters();
 }
 
 // ==================== RECITATION ====================
-function renderRecStudentsSelect() {
-  document.getElementById('recStudentId').innerHTML = `<option value="">اختر الطالب</option>` + students.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
-}
-
-function loadStudentRecInfo() {
-  let studentId = parseInt(document.getElementById('recStudentId').value);
-  if(studentId) loadStudentPerformanceChart(studentId);
-}
-
-function loadStudentPerformanceChart(studentId = null) {
-  let sid = studentId || parseInt(document.getElementById('recStudentId')?.value);
-  if(!sid) return;
-  let studentRecs = recitations.filter(r => r.studentId === sid).sort((a,b) => new Date(a.date) - new Date(b.date)).slice(-7);
-  let ctx = document.getElementById('studentPerformanceChart')?.getContext('2d');
-  if(!ctx) return;
-  if(charts.studentPerf) charts.studentPerf.destroy();
-  charts.studentPerf = new Chart(ctx, { type: 'line', data: { labels: studentRecs.map(r => r.date.slice(5)), datasets: [{ label: 'الدرجة', data: studentRecs.map(r => r.score), borderColor: '#4caf50', backgroundColor: 'rgba(76,175,80,.1)', fill: true, tension: 0.4 }, { label: 'عدد الأخطاء', data: studentRecs.map(r => r.tajweedErrors + r.pronunciationErrors + r.memorizationErrors), borderColor: '#ef4444', backgroundColor: 'rgba(239,68,68,.1)', fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top', labels: { font: { size: 11 } } } } } });
+function renderRecStudents() {
+  document.getElementById('recStudentId').innerHTML = `<option value="">اختر الطالب</option>` + students.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
 }
 
 function saveRecitation() {
   let studentId = parseInt(document.getElementById('recStudentId').value);
-  if(!studentId) { showToast('الرجاء اختيار الطالب', 'error'); return; }
+  if(!studentId) { showToast('اختر الطالب', 'error'); return; }
   let surah = document.getElementById('recSurah').value;
   let verses = document.getElementById('recVerses').value;
-  if(!surah || !verses) { showToast('الرجاء إدخال السورة والآيات', 'error'); return; }
+  if(!surah || !verses) { showToast('أدخل السورة والآيات', 'error'); return; }
   let rec = {
     id: Date.now(),
     studentId,
-    type: document.getElementById('recType').value,
-    surah,
-    verses,
+    surah, verses,
     grade: document.getElementById('recGrade').value,
     score: parseInt(document.getElementById('recScore').value),
     tajweedErrors: parseInt(document.getElementById('recTajweed').value),
-    pronunciationErrors: parseInt(document.getElementById('recPron').value),
-    memorizationErrors: parseInt(document.getElementById('recMem').value),
-    notes: document.getElementById('recNotes').value,
     date: new Date().toISOString().split('T')[0]
   };
   recitations.push(rec);
-  let s = students.find(s => s.id === studentId);
-  if(s) {
-    if(rec.score >= 90) s.points += 20;
-    else if(rec.score >= 70) s.points += 10;
-    else if(rec.score >= 50) s.points += 5;
-    if(rec.type === 'new' && rec.score >= 85) s.juzMemorized += 0.5;
-  }
+  let s = students.find(s=>s.id===studentId);
+  if(s) { s.points += rec.score >= 85 ? 20 : 10; if(rec.grade === 'ممتاز') s.juzMemorized += 0.5; }
   saveAllData();
   renderRecHistory();
-  loadStudentPerformanceChart(studentId);
-  updateAllCounters();
-  addNotification(`تم تسجيل تسميع للطالب ${s?.name} بتقييم ${rec.grade}`, 'success');
-  clearRecitationForm();
-  showToast('تم حفظ التسميع بنجاح', 'success');
-}
-
-function sendRecitationToParent() {
-  saveRecitation();
-  let studentId = parseInt(document.getElementById('recStudentId').value);
-  let s = students.find(s => s.id === studentId);
-  if(s && s.parentPhone) {
-    addNotification(`تم إرسال تقرير التسميع إلى ولي أمر ${s.name}`, 'info');
-  }
+  updateCounters();
+  addNotification(`تم تسجيل تسميع للطالب ${s?.name}`);
+  document.getElementById('recSurah').value = '';
+  document.getElementById('recVerses').value = '';
 }
 
 function renderRecHistory() {
-  let recent = [...recitations].sort((a,b) => b.id - a.id).slice(0,15);
-  document.getElementById('recHistoryTable').innerHTML = recent.map(r => {
-    let s = students.find(st => st.id === r.studentId);
-    let totalErrors = r.tajweedErrors + r.pronunciationErrors + r.memorizationErrors;
-    return `<tr><td>${s?.name || 'غير معروف'}</td><td>${r.surah} ${r.verses}</td><td><span class="g-exc">${r.grade}</span></td><td>${r.score}</td><td>${totalErrors}</td><td>${r.date}</td></tr>`;
+  let recent = [...recitations].sort((a,b)=>b.id-a.id).slice(0,10);
+  document.getElementById('recHistoryTable').innerHTML = recent.map(r=>{
+    let s = students.find(st=>st.id===r.studentId);
+    return `<tr><td>${s?.name}</td><td>${r.surah} ${r.verses}</td><td><span class="g-exc">${r.grade}</span></td><td>${r.date}</td></tr>`;
   }).join('');
-}
-
-function clearRecitationForm() {
-  document.getElementById('recSurah').value = '';
-  document.getElementById('recVerses').value = '';
-  document.getElementById('recScore').value = '90';
-  document.getElementById('recTajweed').value = '0';
-  document.getElementById('recPron').value = '0';
-  document.getElementById('recMem').value = '0';
-  document.getElementById('recNotes').value = '';
 }
 
 // ==================== ATTENDANCE ====================
-function renderAttendanceTable() {
+function renderAttendance() {
   let today = new Date().toISOString().split('T')[0];
-  document.getElementById('attendanceTable').innerHTML = students.map(s => {
-    let existing = attendances.find(a => a.studentId === s.id && a.date === today);
-    return `<tr><td><div class="cell-user"><div class="av-sm" style="background:linear-gradient(135deg,var(--g4),var(--g2))">${s.name.charAt(0)}</div><div>${s.name}</div></div></td><td>${halaqas.find(h=>h.id===s.halaqaId)?.name || '-'}</td><td><select class="form-control" id="attStatus_${s.id}" style="width:120px"><option value="حاضر" ${existing?.status === 'حاضر' ? 'selected' : ''}>حاضر</option><option value="غائب" ${existing?.status === 'غائب' ? 'selected' : ''}>غائب</option><option value="متأخر" ${existing?.status === 'متأخر' ? 'selected' : ''}>متأخر</option><option value="معذور" ${existing?.status === 'معذور' ? 'selected' : ''}>معذور</option></select></td><td><input type="text" class="form-control" id="attNote_${s.id}" placeholder="ملاحظات" value="${existing?.note || ''}"></td></tr>`;
+  document.getElementById('attendanceTable').innerHTML = students.map(s=>{
+    let existing = attendances.find(a=>a.studentId===s.id && a.date===today);
+    return `<tr><td><div class="cell-user"><div class="av-sm" style="background:var(--g4)">${s.name.charAt(0)}</div><div>${s.name}</div></div></td><td>${halaqas.find(h=>h.id===s.halaqaId)?.name||'-'}</td><td><select class="form-control" id="attStatus_${s.id}" style="width:120px"><option value="حاضر" ${existing?.status==='حاضر'?'selected':''}>حاضر</option><option value="غائب" ${existing?.status==='غائب'?'selected':''}>غائب</option></select></td><td><input type="text" class="form-control" id="attNote_${s.id}" placeholder="ملاحظات" value="${existing?.note||''}"></td></tr>`;
   }).join('');
-}
-
-function loadTodayAttendance() {
-  renderAttendanceTable();
-  showToast('تم تحديث بيانات الحضور', 'success');
 }
 
 function saveAttendance() {
   let today = new Date().toISOString().split('T')[0];
-  students.forEach(s => {
+  students.forEach(s=>{
     let status = document.getElementById(`attStatus_${s.id}`)?.value;
     let note = document.getElementById(`attNote_${s.id}`)?.value;
-    if(status) {
-      let existingIndex = attendances.findIndex(a => a.studentId === s.id && a.date === today);
-      if(existingIndex >= 0) {
-        attendances[existingIndex].status = status;
-        attendances[existingIndex].note = note;
-      } else {
-        attendances.push({ id: Date.now() + s.id, studentId: s.id, date: today, status, note });
-      }
-      let attendancePercent = attendances.filter(a => a.studentId === s.id && a.status === 'حاضر').length;
-      let totalDays = [...new Set(attendances.filter(a => a.studentId === s.id).map(a => a.date))].length;
-      s.attendance = totalDays ? Math.round((attendancePercent / totalDays) * 100) : 100;
+    if(status){
+      let idx = attendances.findIndex(a=>a.studentId===s.id && a.date===today);
+      if(idx>=0) { attendances[idx].status=status; attendances[idx].note=note; }
+      else attendances.push({ studentId:s.id, date:today, status, note });
+      let present = attendances.filter(a=>a.studentId===s.id && a.status==='حاضر').length;
+      let total = attendances.filter(a=>a.studentId===s.id).length;
+      s.attendance = total ? Math.round((present/total)*100) : 100;
     }
   });
   saveAllData();
-  updateAllCounters();
-  addNotification('تم حفظ الحضور بنجاح', 'success');
-  renderAttendanceChart();
-}
-
-function renderAttendanceChart() {
-  let last30Days = [];
-  for(let i=29; i>=0; i--) {
-    let d = new Date();
-    d.setDate(d.getDate() - i);
-    last30Days.push(d.toISOString().split('T')[0]);
-  }
-  let attendanceData = last30Days.map(date => {
-    let dayAttendances = attendances.filter(a => a.date === date && a.status === 'حاضر');
-    return Math.round((dayAttendances.length / students.length) * 100) || 0;
-  });
-  let ctx = document.getElementById('attendanceChart')?.getContext('2d');
-  if(!ctx) return;
-  if(charts.attendance) charts.attendance.destroy();
-  charts.attendance = new Chart(ctx, { type: 'line', data: { labels: last30Days.map(d => d.slice(5)), datasets: [{ label: 'نسبة الحضور %', data: attendanceData, borderColor: '#4caf50', backgroundColor: 'rgba(76,175,80,.1)', fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { y: { min: 0, max: 100, ticks: { callback: v => v + '%' } } } } });
-}
-
-// ==================== EXAMS ====================
-function renderExamsTable() {
-  document.getElementById('examsTable').innerHTML = exams.map((e,i) => `<tr><td>${e.name}</td><td>${e.date}</td><td>${e.subject}</td><td>${e.participants || 0}</td><td>${e.averageScore || 0}</td><td><button class="btn btn-outline btn-sm" onclick="editExam(${e.id})"><i class="fas fa-edit"></i></button> <button class="btn btn-danger btn-sm" onclick="deleteExam(${e.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('');
-}
-
-function showAddExamModal() {
-  showModal('إضافة اختبار جديد', `<div class="form-group"><label class="form-label">اسم الاختبار</label><input type="text" class="form-control" id="examName"></div><div class="form-row cols-2"><div class="form-group"><label class="form-label">التاريخ</label><input type="date" class="form-control" id="examDate"></div><div class="form-group"><label class="form-label">المادة</label><input type="text" class="form-control" id="examSubject"></div></div>`, () => {
-    let name = document.getElementById('examName').value;
-    if(!name) { showToast('الرجاء إدخال اسم الاختبار', 'error'); return; }
-    exams.push({ id: Date.now(), name, date: document.getElementById('examDate').value || new Date().toISOString().split('T')[0], subject: document.getElementById('examSubject').value, participants: 0, averageScore: 0 });
-    saveAllData();
-    renderExamsTable();
-    addNotification(`تم إضافة الاختبار ${name}`, 'success');
-  });
-}
-
-function deleteExam(id) {
-  exams = exams.filter(e => e.id !== id);
-  saveAllData();
-  renderExamsTable();
-  addNotification('تم حذف الاختبار', 'error');
-}
-
-// ==================== REWARDS ====================
-function renderRewardsTable() {
-  document.getElementById('rewardsTable').innerHTML = rewards.map((r,i) => {
-    let s = students.find(st => st.id === r.studentId);
-    return `<tr><td>${s?.name || 'غير معروف'}</td><td>${r.rewardName}</td><td>${r.points}</td><td>${r.date}</td><td>${r.source}</td></tr>`;
-  }).join('');
-}
-
-function showAddRewardModal() {
-  let studentsOptions = students.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
-  showModal('منح مكافأة', `<div class="form-group"><label class="form-label">الطالب</label><select class="form-control" id="rewardStudentId">${studentsOptions}</select></div><div class="form-group"><label class="form-label">نوع المكافأة</label><input type="text" class="form-control" id="rewardName" placeholder="مثال: نجم الأسبوع"></div><div class="form-row cols-2"><div class="form-group"><label class="form-label">عدد النقاط</label><input type="number" class="form-control" id="rewardPoints" value="50"></div><div class="form-group"><label class="form-label">المصدر</label><input type="text" class="form-control" id="rewardSource" placeholder="مثال: مسابقة"></div></div>`, () => {
-    let studentId = parseInt(document.getElementById('rewardStudentId').value);
-    let points = parseInt(document.getElementById('rewardPoints').value);
-    let s = students.find(s => s.id === studentId);
-    if(s) s.points += points;
-    rewards.push({ id: Date.now(), studentId, rewardName: document.getElementById('rewardName').value, points, date: new Date().toISOString().split('T')[0], source: document.getElementById('rewardSource').value });
-    saveAllData();
-    renderRewardsTable();
-    renderPointsChart();
-    updateAllCounters();
-    addNotification(`تم منح ${points} نقطة للطالب ${s?.name}`, 'success');
-  });
-}
-
-function renderPointsChart() {
-  let topStudents = [...students].sort((a,b) => b.points - a.points).slice(0,10);
-  let ctx = document.getElementById('pointsChart')?.getContext('2d');
-  if(!ctx) return;
-  if(charts.points) charts.points.destroy();
-  charts.points = new Chart(ctx, { type: 'bar', data: { labels: topStudents.map(s => s.name), datasets: [{ label: 'النقاط', data: topStudents.map(s => s.points), backgroundColor: 'rgba(76,175,80,.7)', borderRadius: 5 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { y: { beginAtZero: true } } } });
+  updateCounters();
+  addNotification('تم حفظ الحضور');
 }
 
 // ==================== CERTIFICATE ====================
-function renderCertStudentsSelect() {
-  document.getElementById('certStudentId').innerHTML = students.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
-  document.getElementById('certDate').value = new Date().toISOString().split('T')[0];
-  updateCertPreview();
-}
-
-function updateCertPreview() {
-  let studentId = parseInt(document.getElementById('certStudentId')?.value);
-  let s = students.find(s => s.id === studentId);
-  let type = document.getElementById('certType')?.value || 'شهادة إتمام حفظ جزء';
-  let details = document.getElementById('certDetails')?.value || 'الجزء الثلاثين';
-  let teacher = document.getElementById('certTeacher')?.value || '___________';
-  let director = document.getElementById('certDirector')?.value || '___________';
-  let date = document.getElementById('certDate')?.value || new Date().toISOString().split('T')[0];
-  document.getElementById('certPreviewTitle').innerText = type;
-  document.getElementById('certPreviewStudent').innerText = s?.name || 'الطالب';
-  document.getElementById('certPreviewDetails').innerHTML = details;
-  document.getElementById('certPreviewTeacher').innerHTML = `المحفظ: ${teacher}`;
-  document.getElementById('certPreviewDirector').innerHTML = `مدير الدار: ${director}`;
-  document.getElementById('certPreviewDate').innerHTML = `التاريخ: ${new Date(date).toLocaleDateString('ar-SA')}`;
+function renderCertStudents() {
+  document.getElementById('certStudentId').innerHTML = students.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
 }
 
 function generateCertificate() {
   let studentId = parseInt(document.getElementById('certStudentId').value);
-  let s = students.find(s => s.id === studentId);
-  if(!s) { showToast('الرجاء اختيار طالب', 'error'); return; }
+  let s = students.find(s=>s.id===studentId);
+  if(!s) { showToast('اختر طالباً', 'error'); return; }
+  let type = document.getElementById('certType').value;
+  let details = document.getElementById('certDetails').value || 'ما نال عليه الشهادة';
   let win = window.open('', '_blank');
-  win.document.write(`<html dir="rtl"><head><title>شهادة تقدير</title><style>body{font-family:'Amiri',serif;padding:40px;background:#fffef0} .cert{max-width:800px;margin:0 auto;border:5px double #DAA520;padding:40px;text-align:center}</style></head><body><div class="cert"><h2>دار الإمام مالك لتحفيظ القرآن الكريم</h2><div style="margin:20px 0"></div><h3>${document.getElementById('certType').value}</h3><p>تشهد الدار بأن الطالب</p><h1>${s.name}</h1><p>قد أتم بفضل الله تعالى وعونه<br>حفظ <strong>${document.getElementById('certDetails').value || 'ما نال عليه الشهادة'}</strong><br>وذلك بمستوى ممتاز وإتقان تام</p><div style="margin:20px 0">﴿ وَلَقَدْ يَسَّرْنَا الْقُرْآنَ لِلذِّكْرِ فَهَلْ مِن مُّدَّكِرٍ ﴾</div><div style="display:flex;justify-content:space-between;margin-top:30px"><div>المحفظ: ${document.getElementById('certTeacher').value || '___________'}</div><div>مدير الدار: ${document.getElementById('certDirector').value || '___________'}</div></div><div style="margin-top:20px">${new Date(document.getElementById('certDate').value).toLocaleDateString('ar-SA')}</div></div></body></html>`);
+  win.document.write(`<html dir="rtl"><head><title>شهادة</title><style>body{font-family:'Amiri',serif;padding:40px;text-align:center}</style></head><body><div style="border:3px double #DAA520;padding:40px"><h2>دار الإمام مالك</h2><h3>${type}</h3><p>تشهد الدار بأن الطالب</p><h1>${s.name}</h1><p>قد أتم ${details} بنجاح</p><p>${new Date().toLocaleDateString('ar-SA')}</p></div></body></html>`);
   win.print();
-  addNotification(`تم إصدار شهادة للطالب ${s.name}`, 'success');
-}
-
-function downloadCertificatePDF() {
-  showToast('جاري تحضير ملف PDF...', 'info');
-  setTimeout(() => { generateCertificate(); }, 500);
-}
-
-function shareCertificate() {
-  showToast('يمكن مشاركة الشهادة عبر طباعتها أو حفظها كملف PDF', 'info');
+  addNotification(`تم إصدار شهادة للطالب ${s.name}`);
 }
 
 // ==================== COMPETITIONS ====================
-function renderCompetitionsTable() {
-  document.getElementById('competitionsTable').innerHTML = competitions.map((c,i) => `<tr><td>${c.name}</td><td>${c.date}</td><td>${c.participants || 0}</td><td><span class="badge b-${c.status === 'نشطة' ? 'green' : 'gray'}">${c.status}</span></td><td><button class="btn btn-outline btn-sm" onclick="editCompetition(${c.id})"><i class="fas fa-edit"></i></button> <button class="btn btn-danger btn-sm" onclick="deleteCompetition(${c.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('');
+function renderCompetitions() {
+  document.getElementById('competitionsTable').innerHTML = competitions.map((c,i)=>`<tr><td>${c.name}</td><td>${c.date}</td><td><span class="badge b-green">${c.status}</span></td><td><button class="btn btn-danger btn-sm" onclick="deleteCompetition(${c.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('');
 }
 
 function showAddCompetitionModal() {
-  showModal('إضافة مسابقة جديدة', `<div class="form-group"><label class="form-label">اسم المسابقة <span class="req">*</span></label><input type="text" class="form-control" id="compName"></div><div class="form-row cols-2"><div class="form-group"><label class="form-label">التاريخ</label><input type="date" class="form-control" id="compDate"></div><div class="form-group"><label class="form-label">المكان</label><input type="text" class="form-control" id="compLocation"></div></div><div class="form-group"><label class="form-label">الوصف</label><textarea class="form-control" id="compDesc" rows="2"></textarea></div>`, () => {
+  showModal('إضافة مسابقة', `<div class="form-group"><label>الاسم</label><input type="text" class="form-control" id="compName"></div><div class="form-group"><label>التاريخ</label><input type="date" class="form-control" id="compDate"></div>`, () => {
     let name = document.getElementById('compName').value;
-    if(!name) { showToast('الرجاء إدخال اسم المسابقة', 'error'); return; }
-    competitions.push({ id: Date.now(), name, date: document.getElementById('compDate').value || new Date().toISOString().split('T')[0], location: document.getElementById('compLocation').value, description: document.getElementById('compDesc').value, status: 'نشطة', participants: 0, results: [] });
+    if(!name) { showToast('أدخل الاسم', 'error'); return; }
+    competitions.push({ id: Date.now(), name, date: document.getElementById('compDate').value || new Date().toISOString().split('T')[0], status: 'نشطة' });
     saveAllData();
-    renderCompetitionsTable();
-    addNotification(`تم إضافة المسابقة ${name}`, 'success');
+    renderCompetitions();
+    addNotification(`تم إضافة المسابقة ${name}`);
   });
 }
 
 function deleteCompetition(id) {
-  competitions = competitions.filter(c => c.id !== id);
+  competitions = competitions.filter(c=>c.id!==id);
   saveAllData();
-  renderCompetitionsTable();
-  addNotification('تم حذف المسابقة', 'error');
-}
-
-function renderCompetitionLeaderboard() {
-  let topStudents = [...students].sort((a,b) => b.points - a.points).slice(0,10);
-  document.getElementById('competitionLeaderboard').innerHTML = `<div class="leaderboard"><div class="info-box ib-gold"><i class="fas fa-trophy"></i><div>ترتيب الطلاب حسب النقاط</div></div>${topStudents.map((s,i) => `<div class="leaderboard-item" style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--border)"><div class="rank-badge ${i===0?'rk1':i===1?'rk2':i===2?'rk3':'rk-oth'}">${i+1}</div><div style="flex:1"><div style="font-weight:600">${s.name}</div><div style="font-size:12px">${s.juzMemorized} جزء</div></div><div style="font-weight:700;color:var(--gold)">${s.points} نقطة</div></div>`).join('')}</div>`;
+  renderCompetitions();
 }
 
 // ==================== PARENT PORTAL ====================
-function renderParentStudentsSelect() {
-  document.getElementById('parentStudentId').innerHTML = students.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+function renderParentStudents() {
+  document.getElementById('parentStudentId').innerHTML = students.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
 }
 
 function loadParentData() {
   let studentId = parseInt(document.getElementById('parentStudentId').value);
-  let s = students.find(s => s.id === studentId);
+  let s = students.find(s=>s.id===studentId);
   if(!s) return;
-  let studentRecs = recitations.filter(r => r.studentId === studentId).slice(0,10);
-  let halaqa = halaqas.find(h => h.id === s.halaqaId);
-  let teacher = teachers.find(t => t.id === halaqa?.teacherId);
-  let attendanceRate = attendances.filter(a => a.studentId === studentId && a.status === 'حاضر').length;
-  let totalDays = [...new Set(attendances.filter(a => a.studentId === studentId).map(a => a.date))].length;
-  let attendancePercent = totalDays ? Math.round((attendanceRate / totalDays) * 100) : 100;
+  let recs = recitations.filter(r=>r.studentId===studentId).slice(0,5);
   document.getElementById('parentData').innerHTML = `
-    <div class="stats-grid stats-4" style="margin-bottom:20px">
-      <div class="scard sc1"><div class="sc-info"><h3>${s.juzMemorized}</h3><p>أجزاء محفوظة</p></div><div class="sc-icon si1"><i class="fas fa-book"></i></div></div>
-      <div class="scard sc2"><div class="sc-info"><h3>${attendancePercent}%</h3><p>نسبة الحضور</p></div><div class="sc-icon si2"><i class="fas fa-calendar-check"></i></div></div>
-      <div class="scard sc3"><div class="sc-info"><h3>${s.points}</h3><p>النقاط</p></div><div class="sc-icon si3"><i class="fas fa-star"></i></div></div>
-      <div class="scard sc4"><div class="sc-info"><h3>${recitations.filter(r=>r.studentId===studentId).length}</h3><p>إجمالي التسميعات</p></div><div class="sc-icon si4"><i class="fas fa-book-open"></i></div></div>
-    </div>
-    <div class="info-box ib-green"><i class="fas fa-info-circle"></i><div><strong>${s.name}</strong> — ${halaqa?.name || 'حلقة غير محددة'} — المحفظ: ${teacher?.name || 'غير معين'}</div></div>
-    <div class="card"><div class="card-hdr"><h3><i class="fas fa-history"></i> آخر التسميعات</h3></div><div class="tbl-wrap"><table class="dtbl"><thead><tr><th>التاريخ</th><th>السورة</th><th>الآيات</th><th>التقييم</th><th>الدرجة</th></tr></thead><tbody>${studentRecs.map(r => `<tr><td>${r.date}</td><td>${r.surah}</td><td>${r.verses}</td><td><span class="g-exc">${r.grade}</span></td><td>${r.score}</td></tr>`).join('')}</tbody></table></div></div>
-    <div class="card"><div class="card-hdr"><h3><i class="fas fa-chart-line"></i> تقدم الحفظ</h3></div><div class="card-body"><div class="prog-row"><div class="prog-hdr"><span>إنجاز الحفظ</span><span>${Math.round((s.juzMemorized / 30) * 100)}%</span></div><div class="prog-bar"><div class="prog-fill pf-green" style="width:${Math.round((s.juzMemorized / 30) * 100)}%"></div></div></div></div></div>
-    <button class="btn btn-primary" onclick="sendMessageToTeacher(${studentId})"><i class="fas fa-envelope"></i> التواصل مع المحفظ</button>
+    <div class="info-box ib-green"><i class="fas fa-user"></i><div><strong>${s.name}</strong> - ${s.juzMemorized} أجزاء - ${s.points} نقطة - حضور ${s.attendance}%</div></div>
+    <div class="tbl-wrap"><table class="dtbl"><thead><tr><th>التاريخ</th><th>السورة</th><th>التقييم</th></tr></thead><tbody>${recs.map(r=>`<tr><td>${r.date}</td><td>${r.surah}</td><td>${r.grade}</td></tr>`).join('')}</tbody></table></div>
+    <button class="btn btn-primary" onclick="showToast('تم إرسال رسالة للمحفظ')"><i class="fas fa-envelope"></i> التواصل مع المحفظ</button>
   `;
 }
 
-function sendMessageToTeacher(studentId) {
-  showModal('إرسال رسالة للمحفظ', `<div class="form-group"><label class="form-label">الموضوع</label><input type="text" class="form-control" id="msgSubject"></div><div class="form-group"><label class="form-label">الرسالة</label><textarea class="form-control" id="msgBody" rows="4"></textarea></div>`, () => {
-    let subject = document.getElementById('msgSubject').value;
-    let body = document.getElementById('msgBody').value;
-    if(!subject || !body) { showToast('الرجاء إدخال الموضوع والرسالة', 'error'); return; }
-    let s = students.find(s => s.id === studentId);
-    let halaqa = halaqas.find(h => h.id === s?.halaqaId);
-    let teacher = teachers.find(t => t.id === halaqa?.teacherId);
-    messages.push({ id: Date.now(), from: currentUser.name, to: teacher?.name || 'المحفظ', subject, body, date: new Date().toISOString().split('T')[0], read: false });
-    saveAllData();
-    addNotification(`تم إرسال رسالة إلى المحفظ`, 'success');
-    closeModal();
-  });
-}
-
-// ==================== MESSAGES ====================
-function renderMessagesTable() {
-  document.getElementById('messagesTable').innerHTML = messages.map((m,i) => `<tr><td>${m.from}</td><td>${m.to}</td><td>${m.subject}</td><td>${m.date}</td><td><span class="badge b-${m.read ? 'gray' : 'green'}">${m.read ? 'مقروءة' : 'جديدة'}</span></td><td><button class="btn btn-outline btn-sm" onclick="viewMessage(${m.id})"><i class="fas fa-eye"></i></button> <button class="btn btn-danger btn-sm" onclick="deleteMessage(${m.id})"><i class="fas fa-trash"></i></button></td></tr>`).join('');
-}
-
-function showSendMessageModal() {
-  let teachersOptions = teachers.map(t => `<option value="${t.name}">${t.name}</option>`).join('');
-  showModal('إرسال رسالة جديدة', `<div class="form-group"><label class="form-label">إلى</label><select class="form-control" id="msgTo">${teachersOptions}</select></div><div class="form-group"><label class="form-label">الموضوع</label><input type="text" class="form-control" id="msgSubject"></div><div class="form-group"><label class="form-label">الرسالة</label><textarea class="form-control" id="msgBody" rows="4"></textarea></div>`, () => {
-    let to = document.getElementById('msgTo').value;
-    let subject = document.getElementById('msgSubject').value;
-    let body = document.getElementById('msgBody').value;
-    if(!subject || !body) { showToast('الرجاء إدخال الموضوع والرسالة', 'error'); return; }
-    messages.push({ id: Date.now(), from: currentUser.name, to, subject, body, date: new Date().toISOString().split('T')[0], read: false });
-    saveAllData();
-    renderMessagesTable();
-    addNotification(`تم إرسال رسالة إلى ${to}`, 'success');
-    closeModal();
-  });
-}
-
-function viewMessage(id) {
-  let m = messages.find(m => m.id === id);
-  if(m) {
-    m.read = true;
-    saveAllData();
-    renderMessagesTable();
-    showModal('عرض الرسالة', `<div><strong>من:</strong> ${m.from}</div><div><strong>إلى:</strong> ${m.to}</div><div><strong>التاريخ:</strong> ${m.date}</div><div class="divider"></div><div><strong>الموضوع:</strong> ${m.subject}</div><div class="divider"></div><div><strong>الرسالة:</strong><br>${m.body}</div>`, () => {});
-  }
-}
-
-function deleteMessage(id) {
-  messages = messages.filter(m => m.id !== id);
-  saveAllData();
-  renderMessagesTable();
-  addNotification('تم حذف الرسالة', 'error');
-}
-
-// ==================== FINANCE ====================
-function renderFinanceTable() {
-  document.getElementById('financeTable').innerHTML = payments.map((p,i) => {
-    let s = students.find(st => st.id === p.studentId);
-    return `<tr><td>${p.date}</td><td>${s?.name || 'غير معروف'}</td><td>${p.type}</td><td>${p.amount} ر.س</td><td><span class="badge b-${p.status === 'مدفوع' ? 'green' : 'red'}">${p.status}</span></td><td><button class="btn btn-outline btn-sm" onclick="editPayment(${p.id})"><i class="fas fa-edit"></i></button></td></tr>`;
-  }).join('');
-}
-
-function updateFinanceStats() {
-  let totalIncome = payments.filter(p => p.status === 'مدفوع').reduce((sum, p) => sum + p.amount, 0);
-  let totalExpenses = 0; // يمكن إضافة مصروفات لاحقاً
-  let pendingPayments = payments.filter(p => p.status !== 'مدفوع').reduce((sum, p) => sum + p.amount, 0);
-  document.getElementById('totalIncome').innerText = totalIncome + ' ر.س';
-  document.getElementById('totalExpenses').innerText = totalExpenses + ' ر.س';
-  document.getElementById('totalBalance').innerText = (totalIncome - totalExpenses) + ' ر.س';
-  document.getElementById('pendingPayments').innerText = pendingPayments + ' ر.س';
-}
-
-function showAddPaymentModal() {
-  let studentsOptions = students.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
-  showModal('تسجيل دفعة جديدة', `<div class="form-group"><label class="form-label">الطالب</label><select class="form-control" id="paymentStudentId">${studentsOptions}</select></div><div class="form-row cols-2"><div class="form-group"><label class="form-label">المبلغ</label><input type="number" class="form-control" id="paymentAmount" value="150"></div><div class="form-group"><label class="form-label">نوع الدفعة</label><select class="form-control" id="paymentType"><option>رسوم شهرية</option><option>رسوم تسجيل</option><option>تبرع</option></select></div></div><div class="form-group"><label class="form-label">الحالة</label><select class="form-control" id="paymentStatus"><option value="مدفوع">مدفوع</option><option value="معلق">معلق</option></select></div>`, () => {
-    payments.push({ id: Date.now(), studentId: parseInt(document.getElementById('paymentStudentId').value), amount: parseInt(document.getElementById('paymentAmount').value), date: new Date().toISOString().split('T')[0], type: document.getElementById('paymentType').value, status: document.getElementById('paymentStatus').value });
-    saveAllData();
-    renderFinanceTable();
-    updateFinanceStats();
-    addNotification('تم تسجيل الدفعة بنجاح', 'success');
-  });
-}
-
-function editPayment(id) {
-  let p = payments.find(p => p.id === id);
-  if(!p) return;
-  let studentsOptions = students.map(s => `<option value="${s.id}" ${p.studentId === s.id ? 'selected' : ''}>${s.name}</option>`).join('');
-  showModal('تعديل الدفعة', `<div class="form-group"><label class="form-label">الطالب</label><select class="form-control" id="paymentStudentId">${studentsOptions}</select></div><div class="form-row cols-2"><div class="form-group"><label class="form-label">المبلغ</label><input type="number" class="form-control" id="paymentAmount" value="${p.amount}"></div><div class="form-group"><label class="form-label">نوع الدفعة</label><select class="form-control" id="paymentType"><option ${p.type === 'رسوم شهرية' ? 'selected' : ''}>رسوم شهرية</option><option ${p.type === 'رسوم تسجيل' ? 'selected' : ''}>رسوم تسجيل</option><option ${p.type === 'تبرع' ? 'selected' : ''}>تبرع</option></select></div></div><div class="form-group"><label class="form-label">الحالة</label><select class="form-control" id="paymentStatus"><option value="مدفوع" ${p.status === 'مدفوع' ? 'selected' : ''}>مدفوع</option><option value="معلق" ${p.status === 'معلق' ? 'selected' : ''}>معلق</option></select></div>`, () => {
-    p.studentId = parseInt(document.getElementById('paymentStudentId').value);
-    p.amount = parseInt(document.getElementById('paymentAmount').value);
-    p.type = document.getElementById('paymentType').value;
-    p.status = document.getElementById('paymentStatus').value;
-    saveAllData();
-    renderFinanceTable();
-    updateFinanceStats();
-    addNotification('تم تحديث الدفعة', 'success');
-  });
-}
-
-// ==================== REPORTS ====================
-function renderReports() {
-  let type = document.getElementById('reportType')?.value || 'recitations';
-  let startDate = document.getElementById('reportStartDate')?.value || '2024-01-01';
-  let endDate = document.getElementById('reportEndDate')?.value || new Date().toISOString().split('T')[0];
-  
-  let filteredRecitations = recitations.filter(r => r.date >= startDate && r.date <= endDate);
-  let filteredAttendances = attendances.filter(a => a.date >= startDate && a.date <= endDate);
-  
-  let labels = [];
-  let data = [];
-  
-  if(type === 'recitations') {
-    let dailyRecs = {};
-    filteredRecitations.forEach(r => { dailyRecs[r.date] = (dailyRecs[r.date] || 0) + 1; });
-    labels = Object.keys(dailyRecs).sort();
-    data = labels.map(l => dailyRecs[l]);
-    document.getElementById('reportTable').innerHTML = `<thead><tr><th>التاريخ</th><th>عدد التسميعات</th></tr></thead><tbody>${labels.map(l => `<tr><td>${l}</td><td>${dailyRecs[l]}</td></tr>`).join('')}</tbody>`;
-  } else if(type === 'attendance') {
-    let dailyAttendance = {};
-    filteredAttendances.forEach(a => { if(a.status === 'حاضر') dailyAttendance[a.date] = (dailyAttendance[a.date] || 0) + 1; });
-    labels = Object.keys(dailyAttendance).sort();
-    data = labels.map(l => Math.round((dailyAttendance[l] / students.length) * 100));
-    document.getElementById('reportTable').innerHTML = `<thead><tr><th>التاريخ</th><th>نسبة الحضور</th></tr></thead><tbody>${labels.map(l => `<tr><td>${l}</td><td>${Math.round((dailyAttendance[l] / students.length) * 100)}%</td></tr>`).join('')}</tbody>`;
-  } else if(type === 'grades') {
-    let gradeCount = { ممتاز: 0, 'جيد جداً': 0, جيد: 0, مقبول: 0, ضعيف: 0 };
-    filteredRecitations.forEach(r => { gradeCount[r.grade] = (gradeCount[r.grade] || 0) + 1; });
-    labels = Object.keys(gradeCount);
-    data = Object.values(gradeCount);
-    document.getElementById('reportTable').innerHTML = `<thead><tr><th>التقييم</th><th>العدد</th></tr></thead><tbody>${labels.map(l => `<tr><td>${l}</td><td>${gradeCount[l]}</td></tr>`).join('')}</tbody>`;
-  } else if(type === 'financial') {
-    let dailyIncome = {};
-    payments.filter(p => p.status === 'مدفوع' && p.date >= startDate && p.date <= endDate).forEach(p => { dailyIncome[p.date] = (dailyIncome[p.date] || 0) + p.amount; });
-    labels = Object.keys(dailyIncome).sort();
-    data = labels.map(l => dailyIncome[l]);
-    document.getElementById('reportTable').innerHTML = `<thead><tr><th>التاريخ</th><th>الإيرادات</th></tr></thead><tbody>${labels.map(l => `<tr><td>${l}</td><td>${dailyIncome[l]} ر.س</td></tr>`).join('')}</tbody>`;
-  }
-  
-  let ctx = document.getElementById('reportsChart')?.getContext('2d');
-  if(ctx) {
-    if(charts.reports) charts.reports.destroy();
-    charts.reports = new Chart(ctx, { type: 'line', data: { labels, datasets: [{ label: type === 'attendance' ? 'نسبة الحضور %' : type === 'financial' ? 'الإيرادات (ر.س)' : 'العدد', data, borderColor: '#4caf50', backgroundColor: 'rgba(76,175,80,.1)', fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false } });
-  }
-}
-
-function exportToExcel() {
-  let data = students.map(s => ({ الاسم: s.name, 'الأجزاء المحفوظة': s.juzMemorized, النقاط: s.points, 'نسبة الحضور': s.attendance + '%', 'رقم ولي الأمر': s.parentPhone }));
-  let ws = XLSX.utils.json_to_sheet(data);
-  let wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'الطلاب');
-  XLSX.writeFile(wb, `تقرير_الطلاب_${new Date().toISOString().split('T')[0]}.xlsx`);
-  showToast('تم تصدير التقرير بنجاح', 'success');
-}
-
-async function exportToPDF() {
-  showLoading(true);
-  let element = document.querySelector('#pg-reports .card');
-  if(element) {
-    let canvas = await html2canvas(element, { scale: 2 });
-    let imgData = canvas.toDataURL('image/png');
-    let { jsPDF } = window.jspdf;
-    let pdf = new jsPDF('p', 'mm', 'a4');
-    let imgWidth = 190;
-    let imgHeight = (canvas.height * imgWidth) / canvas.width;
-    pdf.addImage(imgData, 'PNG', 10, 10, imgWidth, imgHeight);
-    pdf.save(`تقرير_الدار_${new Date().toISOString().split('T')[0]}.pdf`);
-  }
-  showLoading(false);
-  showToast('تم تصدير التقرير بنجاح', 'success');
-}
-
-function printReport() {
-  window.print();
-}
-
 // ==================== PROGRESS ====================
-function renderProgressStudentSelect() {
-  document.getElementById('progressStudentSelect').innerHTML = students.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+function renderProgressSelect() {
+  document.getElementById('progressStudentSelect').innerHTML = students.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
 }
 
 function renderQuranMap() {
   let studentId = parseInt(document.getElementById('progressStudentSelect')?.value);
-  let s = students.find(s => s.id === studentId);
+  let s = students.find(s=>s.id===studentId);
   if(!s && students.length) s = students[0];
   if(!s) return;
-  
   let juzStatus = [];
-  for(let i=1; i<=30; i++) {
+  for(let i=1;i<=30;i++) {
     if(s.juzMemorized >= i) juzStatus.push('j-mastered');
     else if(s.juzMemorized >= i-1) juzStatus.push('j-memorized');
     else juzStatus.push('j-empty');
   }
-  document.getElementById('juzMap').innerHTML = juzStatus.map((status,i) => `<div class="juz-cell ${status}" title="الجزء ${i+1}">${i+1}</div>`).join('');
-  document.getElementById('progressJuzCount').innerText = Math.floor(s.juzMemorized);
-  document.getElementById('progressPercent').innerText = Math.round((s.juzMemorized / 30) * 100) + '%';
-  document.getElementById('progressPoints').innerText = s.points;
-  document.getElementById('progressAttendance').innerText = s.attendance + '%';
+  document.getElementById('juzMap').innerHTML = juzStatus.map((st,i)=>`<div class="juz-cell ${st}" title="الجزء ${i+1}">${i+1}</div>`).join('');
 }
 
-// ==================== SETTINGS ====================
-function loadSettings() {
-  document.getElementById('settingDarName').value = localStorage.getItem('darName') || 'دار الإمام مالك';
-  document.getElementById('settingDirectorName').value = localStorage.getItem('directorName') || 'محمد الأحمدي';
-  document.getElementById('settingMonthlyFee').value = localStorage.getItem('monthlyFee') || '150';
-  document.getElementById('settingLanguage').value = localStorage.getItem('language') || 'ar';
-}
-
-function saveSettings() {
-  localStorage.setItem('darName', document.getElementById('settingDarName').value);
-  localStorage.setItem('directorName', document.getElementById('settingDirectorName').value);
-  localStorage.setItem('monthlyFee', document.getElementById('settingMonthlyFee').value);
-  localStorage.setItem('language', document.getElementById('settingLanguage').value);
-  currentUser.name = document.getElementById('settingDirectorName').value;
-  document.getElementById('userName').innerText = currentUser.name;
-  addNotification('تم حفظ الإعدادات بنجاح', 'success');
-}
-
-function resetSettings() {
-  localStorage.removeItem('darName');
-  localStorage.removeItem('directorName');
-  localStorage.removeItem('monthlyFee');
-  localStorage.removeItem('language');
-  loadSettings();
-  addNotification('تم استعادة الإعدادات الافتراضية', 'success');
-}
-
-function resetAllData() {
-  showModal('إعادة تعيين جميع البيانات', '⚠️ تحذير: هذا الإجراء سيحذف جميع البيانات بشكل نهائي. هل أنت متأكد؟', () => {
-    localStorage.clear();
-    initSampleData();
-    loadData();
-    refreshPageData('dashboard');
-    addNotification('تم إعادة تعيين جميع البيانات', 'success');
-    location.reload();
+// ==================== REPORTS ====================
+let reportsChart = null;
+function renderReports() {
+  let monthlyRecs = [0,0,0,0,0,0];
+  recitations.forEach(r=>{
+    let month = new Date(r.date).getMonth();
+    if(month>=6 && month<=11) monthlyRecs[month-6]++;
   });
+  let ctx = document.getElementById('reportsChart')?.getContext('2d');
+  if(ctx){
+    if(reportsChart) reportsChart.destroy();
+    reportsChart = new Chart(ctx, { type:'line', data:{ labels:['يوليو','أغسطس','سبتمبر','أكتوبر','نوفمبر','ديسمبر'], datasets:[{ label:'التسميعات', data:monthlyRecs, borderColor:'#4caf50', fill:true }] }, options:{ responsive:true, maintainAspectRatio:false } });
+  }
+  document.getElementById('reportTable').innerHTML = `<tbody><tr><td>إجمالي الطلاب</td><td>${students.length}</td></tr><tr><td>إجمالي المحفظين</td><td>${teachers.length}</td></tr><tr><td>إجمالي التسميعات</td><td>${recitations.length}</td></tr><tr><td>متوسط النقاط</td><td>${students.length ? Math.round(students.reduce((s,sum)=>s+sum.points,0)/students.length) : 0}</td></tr></tbody>`;
 }
 
 // ==================== INIT ====================
 document.addEventListener('DOMContentLoaded', () => {
   loadData();
   renderDashboard();
-  updateAllCounters();
   document.addEventListener('click', (e) => { if(!e.target.closest('.hico')) document.getElementById('ndrop')?.classList.remove('show'); });
-  setInterval(() => { updateAllCounters(); }, 10000);
 });
 </script>
 </body>
